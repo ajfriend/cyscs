@@ -1,0 +1,158 @@
+import numpy as np
+cimport numpy as cnp # todo: what do i need cimport numpy for?
+# use the python malloc/free to have the memory attributed to python.
+#from cpython.mem cimport PyMem_Malloc, PyMem_Free
+
+def version():
+    cdef char* c_string = scs_version()
+    return c_string
+
+
+# IDEA: scs_solve interface is simple, the cached interface is a little more
+# complicated, with the data input only updating what's necessary.
+
+# maybe I don't even need the c function scs? maybe just do it for error checking?
+
+# todo: assume 64bit int, and double.
+# todo: do we have to convert CSC to 64 bit int?
+# todo: coppying of data and ownership issues....
+
+# todo: check for correct data format and convert if needed (all python)
+# make direct and indirect versions, and call the appropriate one
+# split into python and cython modules (as little code as possible in cython?)
+
+stg_default = dict(normalize = 1,
+                   scale = 1,
+                   rho_x = 1e-3,
+                   max_iters = 2500,
+                   eps = 1e-3,
+                   alpha = 1.5,
+                   cg_rate = 2,
+                   verbose = 1,
+                   warm_start = 0)
+
+
+def solve(dict data, dict cone, **settings):
+    """ Call the C function scs().
+
+    should match solve()
+
+    """
+    A = data['A']
+    cdef scs_int m, n 
+    m, n = A.shape
+
+    A.indices = A.indices.astype(np.int64)
+    A.indptr = A.indptr.astype(np.int64)
+
+    cdef AMatrix _A = make_amatrix(A.data, A.indices, A.indptr, m, n)
+
+    cdef scs_float[:] b = data['b']
+    cdef scs_float[:] c = data['c']
+
+    stgs = stg_default.copy()
+    stgs.update(settings)
+    cdef Settings _settings = stgs
+
+    cdef Data _data = Data(m, n, &_A, &b[0], &c[0], &_settings)
+
+    cdef Cone pycone = Cone(**cone)
+
+    sol = dict(x=np.zeros(n), y=np.zeros(m), s=np.zeros(m))
+    cdef Sol _sol = make_sol(sol['x'], sol['y'], sol['s'])
+
+    cdef Info _info
+
+    cdef scs_int result = scs(&_data, &pycone._cone, &_sol, &_info)
+
+    sol['info'] = _info
+
+    return sol
+
+
+
+cdef Sol make_sol(scs_float[:] x, scs_float[:] y, scs_float[:] s):
+    cdef Sol sol = Sol(&x[0], &y[0], &s[0])
+    return sol
+
+cdef AMatrix make_amatrix(scs_float[:] data, scs_int[:] ind, scs_int[:] indptr, scs_int m, scs_int n):
+    # Amatrix is not really big, so there's no need to dynamically allocate it.
+    # difference with C/python? don't need to make this dynamically declared?
+    # maybe fill a local array and then memcopy to dynamically allocated array
+    cdef AMatrix cA = AMatrix(&data[0], &ind[0], &indptr[0], m, n)
+    return cA
+
+cdef class Cone:
+    cdef:
+        _Cone _cone
+        cnp.ndarray q, s, p
+    
+    def __cinit__(self, scs_int f=0, scs_int l=0, q=None, s=None, p=None, scs_int ep=0, scs_int ed=0):
+        self._cone = _Cone(f=f,l=l,ep=ep,ed=ed,
+                              q=NULL,
+                              qsize=0,
+                              s=NULL,
+                              ssize=0,
+                              p=NULL,
+                              psize=0)
+
+        if q is not None and len(q) > 0:
+            self.q = np.array(q, dtype=np.int64)
+            self.q.flags.writeable = False
+            self._cone.q = <scs_int *>self.q.data
+            self._cone.qsize = len(self.q)
+            
+        if s is not None and len(s) > 0:
+            self.s = np.array(s, dtype=np.int64)
+            self.s.flags.writeable = False
+            self._cone.s = <scs_int *>self.s.data
+            self._cone.ssize = len(self.s)
+            
+        if p is not None and len(p) > 0:
+            self.p = np.array(p, dtype=np.float64)
+            self.p.flags.writeable = False
+            self._cone.p = <scs_float *>self.p.data
+            self._cone.psize = len(self.p)
+            
+    def __len__(self):
+        cdef scs_int total = 0
+        total += self._cone.f
+        total += self._cone.l
+        total += self._cone.ep
+        total += self._cone.ed
+        total += self._cone.qsize
+        total += self._cone.ssize
+        total += self._cone.psize
+        return total
+
+            
+    def todict(self):
+        d = dict(f=self._cone.f, l=self._cone.l, ep=self._cone.ep, ed=self._cone.ed)
+        if self._cone.qsize > 0:
+            d['q'] = self.q
+        else:
+            d['q'] = []
+        
+        if self._cone.ssize > 0:
+            d['s'] = self.s
+        else:
+            d['s'] = []
+            
+        if self._cone.psize > 0:
+            d['p'] = self.p
+        else:
+            d['p'] = []
+
+        return d
+    
+    def __repr__(self):
+        d = self.todict()
+        s = 'Cone('
+        s += ', '.join('{}={}'.format(k,d[k]) for k in d)
+        s += ')'
+        return s
+    
+    def __str__(self):
+        return repr(self)
+        
+

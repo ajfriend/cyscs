@@ -1,8 +1,11 @@
+.DS_Store
+
 # C extensions
 *.so
 
 # Distribution / packaging
 .Python
+*.pyc
 env/
 build/
 develop-eggs/
