@@ -51,16 +51,22 @@ ext['include_dirs'] += [numpy.get_include()]
 # create the extension module arguments for the direct solver version
 # deep copy so that the dictionaries do not point to the same list objects
 ext_direct = copy.deepcopy(ext)
-#ext_direct['name'] = '_scs_direct'
+# next two names need to match
+ext_direct['name'] = '_scs_direct'
+ext_direct['sources'] += ['_scs_direct.pyx']
 ext_direct['sources'] += glober(rootDir, ['linsys/direct/*.c', 'linsys/direct/external/*.c'])
 ext_direct['include_dirs'] += glober(rootDir, ['linsys/direct/', 'linsys/direct/external/'])
 
-# indirect solver extension module arguments
-ext_cyscs = copy.deepcopy(ext_direct)
-ext_cyscs['name'] = '_scs_direct'
-ext_cyscs['sources'] += ['_scs_direct.pyx']
-cyscs = Extension(**ext_cyscs)
 
+ext_indirect = copy.deepcopy(ext)
+ext_indirect['name'] = '_scs_indirect'
+ext_indirect['sources'] += ['_scs_indirect.pyx']
+ext_indirect['sources'] += glober(rootDir, ['linsys/indirect/*.c'])
+ext_indirect['include_dirs'] += glober(rootDir, ['linsys/indirect/'])
+ext_indirect['define_macros'] += [('INDIRECT', None)]
+
+extensions = [Extension(**ext_direct),
+              Extension(**ext_indirect)]
 
 
 setup(name='scs',
@@ -70,7 +76,7 @@ setup(name='scs',
         url = 'http://github.com/cvxgrp/scs',
         description='scs: splitting conic solver',
         py_modules=['scs'],
-        ext_modules=cythonize(cyscs),
+        ext_modules=cythonize(extensions),
         install_requires=["numpy >= 1.7","scipy >= 0.13.2"],
         license = "MIT",
         long_description=("Solves convex cone programs via operator splitting. "
