@@ -52,15 +52,15 @@ ext['include_dirs'] += [numpy.get_include()]
 # deep copy so that the dictionaries do not point to the same list objects
 ext_direct = copy.deepcopy(ext)
 # next two names need to match
-ext_direct['name'] = '_scs_direct'
-ext_direct['sources'] += ['src/_scs_direct.pyx']
+ext_direct['name'] = 'scs.cython._scs_direct'
+ext_direct['sources'] += ['src/cython/_scs_direct.pyx']
 ext_direct['sources'] += glober(rootDir, ['linsys/direct/*.c', 'linsys/direct/external/*.c'])
 ext_direct['include_dirs'] += glober(rootDir, ['linsys/direct/', 'linsys/direct/external/'])
 
 
 ext_indirect = copy.deepcopy(ext)
-ext_indirect['name'] = '_scs_indirect'
-ext_indirect['sources'] += ['src/_scs_indirect.pyx']
+ext_indirect['name'] = 'scs.cython._scs_indirect'
+ext_indirect['sources'] += ['src/cython/_scs_indirect.pyx']
 ext_indirect['sources'] += glober(rootDir, ['linsys/indirect/*.c'])
 ext_indirect['include_dirs'] += glober(rootDir, ['linsys/indirect/'])
 ext_indirect['define_macros'] += [('INDIRECT', None)]
