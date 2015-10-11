@@ -53,14 +53,14 @@ ext['include_dirs'] += [numpy.get_include()]
 ext_direct = copy.deepcopy(ext)
 # next two names need to match
 ext_direct['name'] = '_scs_direct'
-ext_direct['sources'] += ['_scs_direct.pyx']
+ext_direct['sources'] += ['src/_scs_direct.pyx']
 ext_direct['sources'] += glober(rootDir, ['linsys/direct/*.c', 'linsys/direct/external/*.c'])
 ext_direct['include_dirs'] += glober(rootDir, ['linsys/direct/', 'linsys/direct/external/'])
 
 
 ext_indirect = copy.deepcopy(ext)
 ext_indirect['name'] = '_scs_indirect'
-ext_indirect['sources'] += ['_scs_indirect.pyx']
+ext_indirect['sources'] += ['src/_scs_indirect.pyx']
 ext_indirect['sources'] += glober(rootDir, ['linsys/indirect/*.c'])
 ext_indirect['include_dirs'] += glober(rootDir, ['linsys/indirect/'])
 ext_indirect['define_macros'] += [('INDIRECT', None)]
@@ -75,6 +75,7 @@ setup(name='scs',
         author_email = 'bodonoghue85@gmail.com',
         url = 'http://github.com/cvxgrp/scs',
         description='scs: splitting conic solver',
+        package_dir = {'': 'src'},
         py_modules=['scs'],
         ext_modules=cythonize(extensions),
         install_requires=["numpy >= 1.7","scipy >= 0.13.2"],
