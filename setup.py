@@ -3,7 +3,7 @@ from platform import system
 from Cython.Build import cythonize
 import copy
 from collections import defaultdict
-from helper import glober, add_blas_lapack_info
+from setup_helper import glober, add_blas_lapack_info
 import numpy
 
 # use 'export OMP_NUM_THREADS=16' to control num of threads (in that case, 16)
