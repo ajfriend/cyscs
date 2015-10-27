@@ -70,7 +70,7 @@ extensions = [Extension(**ext_direct),
 
 
 setup(name='scs',
-        version='1.1.7',
+        version='1.1.8',
         author = 'Brendan O\'Donoghue',
         author_email = 'bodonoghue85@gmail.com',
         url = 'http://github.com/cvxgrp/scs',

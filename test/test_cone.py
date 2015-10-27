@@ -1,5 +1,8 @@
+from __future__ import print_function
+
 import numpy as np
 import scipy.sparse as sp
+
 
 def test_import():
     import scs
@@ -7,7 +10,7 @@ def test_import():
 def test_cone():
     import scs
     d = dict(f=1, l=20, ep=4, ed=7, q=[3,4,9,10], s=[0,1,4], p=[.1, -.7])
-    print scs.Cone(**d)
+    print(scs.Cone(**d))
 
 def test_version():
     import scs
@@ -15,6 +18,8 @@ def test_version():
 
     # pkg_resources.require("scs")[0].version set in setup.py
     # scs.version set in constants.h
+    print(scs.version())
+    print(pkg_resources.require("scs")[0].version)
     assert scs.version() == pkg_resources.require("scs")[0].version
 
 def test_simple():
@@ -29,10 +34,10 @@ def test_simple():
     data = dict(A=A, b=b, c=c, cones=cone)
 
     import scs
-    print 'test simple: \n'
+    print('test simple: \n')
     sol = scs.solve(data, cone, eps=1e-9, alpha=.1)
 
-    print sol
+    print(sol)
 
-    print sol.keys()
-    print sol['info'].keys()
+    print(sol.keys())
+    print(sol['info'].keys())

@@ -1,6 +1,7 @@
 # scs_python
 Cython interface for SCS
 - `source env/bin/activate` virtual environment
+- make sure `nosetests` points to the virtualenv
 - `deactivate` virtual environment
 - `make clean` to pip uninstall and remove Cython build files
 - `make test` to run nosetests
@@ -21,3 +22,6 @@ in `src/scs`
     - hidden modules
     - `__init__.py`
     - figure out and simplify
+
+# scipy/cython C integer types
+https://github.com/scikit-learn/scikit-learn/wiki/C-integer-types:-the-missing-manual
