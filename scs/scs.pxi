@@ -127,6 +127,7 @@ cdef class Cone:
 
             
     def todict(self):
+        # todo: do i need the empty lists?
         d = dict(f=self._cone.f, l=self._cone.l, ep=self._cone.ep, ed=self._cone.ed)
         if self._cone.qsize > 0:
             d['q'] = self.q
