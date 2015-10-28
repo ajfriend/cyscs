@@ -43,7 +43,7 @@ def solve(dict data, dict cone, dict settings):
 
     cdef Cone pycone = Cone(**cone)
 
-    # todo: sol prep should be done at python level
+    # todo: sol prep should be done at python level?
     sol = dict(x=np.zeros(n), y=np.zeros(m), s=np.zeros(m))
     cdef Sol _sol = make_sol(sol['x'], sol['y'], sol['s'])
 

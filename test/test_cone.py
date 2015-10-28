@@ -31,13 +31,53 @@ def test_simple():
     c = np.array([1.,1.,-1,-1])
     cone = {'l': 4}
 
-    data = dict(A=A, b=b, c=c, cones=cone)
+    data = dict(A=A, b=b, c=c)
 
     import scs
     print('test simple: \n')
-    sol = scs.solve(data, cone, eps=1e-9, alpha=.1, apples=4)
+    sol = scs.solve(data, cone, eps=1e-9, alpha=.1)
 
     print(sol)
 
     print(sol.keys())
     print(sol['info'].keys())
+
+def test_extra_arg():
+
+    ij = np.array([[0,1,2,3],[0,1,2,3]])
+    A = sp.csc_matrix(([-1.,-1.,1.,1.], ij), (4,4))
+    #A.indices = A.indices.astype(np.int64)
+    #A.indptr = A.indptr.astype(np.int64)
+    b = np.array([0.,0.,1,1])
+    c = np.array([1.,1.,-1,-1])
+    cone = {'l': 4}
+
+    data = dict(A=A, b=b, c=c)
+    import scs
+    sol = scs.solve(data, cone, eps=1e-9, alpha=.1, nonsense_arg='nonsense')
+
+def test_simple_indirect():
+    ij = np.array([[0,1,2,3],[0,1,2,3]])
+    A = sp.csc_matrix(([-1.,-1.,1.,1.], ij), (4,4))
+    #A.indices = A.indices.astype(np.int64)
+    #A.indptr = A.indptr.astype(np.int64)
+    b = np.array([0.,0.,1,1])
+    c = np.array([1.,1.,-1,-1])
+    cone = {'l': 4}
+
+    data = dict(A=A, b=b, c=c)
+    import scs
+    sol = scs.solve(data, cone, eps=1e-9, alpha=.1, use_indirect=True)
+
+def test_simple_direct():
+    ij = np.array([[0,1,2,3],[0,1,2,3]])
+    A = sp.csc_matrix(([-1.,-1.,1.,1.], ij), (4,4))
+    #A.indices = A.indices.astype(np.int64)
+    #A.indptr = A.indptr.astype(np.int64)
+    b = np.array([0.,0.,1,1])
+    c = np.array([1.,1.,-1,-1])
+    cone = {'l': 4}
+
+    data = dict(A=A, b=b, c=c)
+    import scs
+    sol = scs.solve(data, cone, eps=1e-9, alpha=.1, use_indirect=False)
