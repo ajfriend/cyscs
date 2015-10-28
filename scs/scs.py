@@ -1,28 +1,25 @@
-from ._indirect import Cone, version
-from ._indirect import solve as solve_indir
+from ._direct import Cone, version
+
+from ._direct import Cone as Cone_dir
 from ._direct import solve as solve_dir
+
+from ._indirect import Cone as Cone_indir
+from ._indirect import solve as solve_indir
 
 from warnings import warn
 import scipy.sparse as sp
 import numpy as np
 
-
-# call either direct or indirect
-# make sure matrices and vectors in right format, datatype
-# do i need two different versions of Cone and 'version'?
-
 # can i install with 'python setup.py' outside of a virtualenv?
 # can i do the numpy install after the fact?
-# can i grab the default settings from C?
-
-# issue warnings for having to convert data format?
 
 # todo: add some tests that these checks do the right thing
 
-
-
 def default_settings():
     # todo: note that unrecognized keyword argument settings are silently ignored?
+    # todo: would be nice to grab defaults from C, but Cython doesn't
+    # actually read C headerfiles, so it can't get the SCS macros
+    # however, is possible if defaults are exposed as variables or function
     stg_default = dict(normalize = 1,
                        scale = 1,
                        rho_x = 1e-3,
@@ -39,18 +36,27 @@ def solve(data, cone, **settings):
     stg = default_settings()
     stg.update(settings)
 
-    # todo: decide if we should overwrite data with modified matrices
-    data = check_data(data)
-    #todo: check that cones are good
+    # switch on the direct/indirect solver
+    # even though Cone is identical between the two solvers, they compiled to
+    # different types, so we get a type mismatch if we try to mix them
     if stg['use_indirect']:
-        return solve_indir(data, cone, stg)
+        Cone = Cone_indir
+        solve_ = solve_indir
     else:
-        return solve_dir(data, cone, stg)
+        Cone = Cone_dir
+        solve_ = solve_dir
+
+    cone = Cone(**cone)
+
+    # todo: decide if we should overwrite data with modified matrices
+    data = check_data(data, cone)
+
+    return solve_(data, cone, stg)
 
 def not_met(*vargs):
     return not all(vargs)
 
-def check_data(data):
+def check_data(data, cone):
     # data has elements A, b, c
     if not_met('A' in data, 'b' in data, 'c' in data):
         raise TypeError("Missing one or more of A, b, c from data dictionary")
@@ -95,6 +101,9 @@ def check_data(data):
     if not_met(A.data.dtype == np.float64):
         warn("Converting A.data to array with dtype = numpy.float64")
         A.data = A.data.astype(np.float64)
+
+    if not_met(len(cone) > 0, A.shape[0] == len(cone)):
+        raise ValueError('The cones must match the number of rows of A.')
 
     # return modified data if we needed to convert anything
     data = dict(A=A,b=b,c=c)

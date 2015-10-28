@@ -22,10 +22,8 @@ def version():
 # split into python and cython modules (as little code as possible in cython?)
 
 
-def solve(dict data, dict cone, dict settings):
+def solve(dict data, Cone cone, dict settings):
     """ Call the C function scs().
-
-    should match solve()
 
     """
     A = data['A']
@@ -41,15 +39,13 @@ def solve(dict data, dict cone, dict settings):
 
     cdef Data _data = Data(m, n, &_A, &b[0], &c[0], &_settings)
 
-    cdef Cone pycone = Cone(**cone)
-
     # todo: sol prep should be done at python level?
     sol = dict(x=np.zeros(n), y=np.zeros(m), s=np.zeros(m))
     cdef Sol _sol = make_sol(sol['x'], sol['y'], sol['s'])
 
     cdef Info _info
 
-    cdef scs_int result = scs(&_data, &pycone._cone, &_sol, &_info)
+    cdef scs_int result = scs(&_data, &cone._cone, &_sol, &_info)
 
     sol['info'] = _info
 
