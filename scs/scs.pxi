@@ -114,30 +114,42 @@ cdef class Cone:
             
     def todict(self):
         # todo: do i need the empty lists?
-        d = dict(f=self._cone.f, l=self._cone.l, ep=self._cone.ep, ed=self._cone.ed)
+        d = {}
+        if self._cone.f > 0:
+            d['f'] = self._cone.f
+
+        if self._cone.l > 0:
+            d['l'] = self._cone.l
+
+        if self._cone.ep > 0:
+            d['ep'] = self._cone.ep
+
+        if self._cone.ed > 0:
+            d['ed'] = self._cone.ed
+
         if self._cone.qsize > 0:
             d['q'] = self.q
-        else:
-            d['q'] = []
         
         if self._cone.ssize > 0:
             d['s'] = self.s
-        else:
-            d['s'] = []
             
         if self._cone.psize > 0:
             d['p'] = self.p
-        else:
-            d['p'] = []
 
         return d
     
     def __repr__(self):
         d = self.todict()
         s = 'Cone('
-        s += ', '.join('{}={}'.format(k,d[k]) for k in d)
+        s += ', '.join('{}={}'.format(k, self.array_repr(d[k])) for k in d)
         s += ')'
         return s
+
+    def array_repr(self, item):
+        if isinstance(item, int):
+            return item
+        else:
+            return list(item)
     
     def __str__(self):
         return repr(self)
