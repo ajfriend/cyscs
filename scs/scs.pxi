@@ -78,33 +78,41 @@ cdef class Cone:
                               p=NULL,
                               psize=0)
 
+        #todo: get rid of the weird branch for empty arrays
+        # just have the pointer point to the empyt numpy array memory with zero size
         if q is not None and len(q) > 0:
             self.q = np.array(q, dtype=np.int64)
             self.q.flags.writeable = False
             self._cone.q = <scs_int *>self.q.data
             self._cone.qsize = len(self.q)
+        else:
+            self.q = np.array([], dtype=np.int64)
             
         if s is not None and len(s) > 0:
             self.s = np.array(s, dtype=np.int64)
             self.s.flags.writeable = False
             self._cone.s = <scs_int *>self.s.data
             self._cone.ssize = len(self.s)
+        else:
+            self.s = np.array([], dtype=np.int64)
             
         if p is not None and len(p) > 0:
             self.p = np.array(p, dtype=np.float64)
             self.p.flags.writeable = False
             self._cone.p = <scs_float *>self.p.data
             self._cone.psize = len(self.p)
+        else:
+            self.p = np.array([], dtype=np.float64)
             
     def __len__(self):
         cdef scs_int total = 0
         total += self._cone.f
         total += self._cone.l
-        total += self._cone.ep
-        total += self._cone.ed
-        total += self._cone.qsize
-        total += self._cone.ssize
-        total += self._cone.psize
+        total += 3*self._cone.ep
+        total += 3*self._cone.ed
+        total += sum(self.q)
+        total += sum((self.s*(self.s+1))/2)
+        total += 3*self._cone.psize
         return total
 
             

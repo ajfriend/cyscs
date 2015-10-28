@@ -12,7 +12,6 @@ in `src/scs`
 
 
 # TODO
-- i get an error with `python setup.py` having to do with numpy includes; maybe I should be catching it and continue on...
 - do memory checks
 - check that options works as expected
 - how to package: `setup.py` can't import cython without adding cython as dependency? sub command?
@@ -25,7 +24,23 @@ in `src/scs`
 - memory checks
 - python 3
 - installer
-- blas location and wrapping of exceptions
+- add power cone support
+
+# blas warning
+I get this when i run `python setup.py install`:
+
+```
+/Users/ajfriend/Dropbox/work/scs_python/env/lib/python2.7/site-packages/numpy/distutils/system_info.py:635: UserWarning: Specified path  is invalid.
+  warnings.warn('Specified path %s is invalid.' % d)
+```
+
+# CVXPY tests
+- test simple problems with each type of cone:
+- this one below spotted a bug that the exp cone has size 3
+```
+x = cvx.Variable()
+prob = cvx.Problem(cvx.Maximize(cvx.log(x)), [x >= 1, x <= 10])
+```
 
 # scipy/cython C integer types
 https://github.com/scikit-learn/scikit-learn/wiki/C-integer-types:-the-missing-manual
