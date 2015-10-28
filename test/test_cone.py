@@ -25,8 +25,8 @@ def test_version():
 def test_simple():
     ij = np.array([[0,1,2,3],[0,1,2,3]])
     A = sp.csc_matrix(([-1.,-1.,1.,1.], ij), (4,4))
-    A.indices = A.indices.astype(np.int64)
-    A.indptr = A.indptr.astype(np.int64)
+    #A.indices = A.indices.astype(np.int64)
+    #A.indptr = A.indptr.astype(np.int64)
     b = np.array([0.,0.,1,1])
     c = np.array([1.,1.,-1,-1])
     cone = {'l': 4}
@@ -35,7 +35,7 @@ def test_simple():
 
     import scs
     print('test simple: \n')
-    sol = scs.solve(data, cone, eps=1e-9, alpha=.1)
+    sol = scs.solve(data, cone, eps=1e-9, alpha=.1, apples=4)
 
     print(sol)
 

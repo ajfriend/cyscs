@@ -21,18 +21,8 @@ def version():
 # make direct and indirect versions, and call the appropriate one
 # split into python and cython modules (as little code as possible in cython?)
 
-stg_default = dict(normalize = 1,
-                   scale = 1,
-                   rho_x = 1e-3,
-                   max_iters = 2500,
-                   eps = 1e-3,
-                   alpha = 1.5,
-                   cg_rate = 2,
-                   verbose = 1,
-                   warm_start = 0)
 
-
-def solve(dict data, dict cone, **settings):
+def solve(dict data, dict cone, dict settings):
     """ Call the C function scs().
 
     should match solve()
@@ -42,22 +32,18 @@ def solve(dict data, dict cone, **settings):
     cdef scs_int m, n 
     m, n = A.shape
 
-    A.indices = A.indices.astype(np.int64)
-    A.indptr = A.indptr.astype(np.int64)
-
     cdef AMatrix _A = make_amatrix(A.data, A.indices, A.indptr, m, n)
 
     cdef scs_float[:] b = data['b']
     cdef scs_float[:] c = data['c']
 
-    stgs = stg_default.copy()
-    stgs.update(settings)
-    cdef Settings _settings = stgs
+    cdef Settings _settings = settings
 
     cdef Data _data = Data(m, n, &_A, &b[0], &c[0], &_settings)
 
     cdef Cone pycone = Cone(**cone)
 
+    # todo: sol prep should be done at python level
     sol = dict(x=np.zeros(n), y=np.zeros(m), s=np.zeros(m))
     cdef Sol _sol = make_sol(sol['x'], sol['y'], sol['s'])
 

@@ -1,4 +1,6 @@
-from ._indirect import Cone, solve, version
+from ._indirect import Cone, version
+from ._indirect import solve as solve_indir
+from ._direct import solve as solve_dir
 
 from warnings import warn
 import scipy.sparse as sp
@@ -16,6 +18,34 @@ import numpy as np
 # issue warnings for having to convert data format?
 
 # todo: add some tests that these checks do the right thing
+
+
+
+def default_settings():
+    # todo: note that unrecognized keyword argument settings are silently ignored?
+    stg_default = dict(normalize = 1,
+                       scale = 1,
+                       rho_x = 1e-3,
+                       max_iters = 2500,
+                       eps = 1e-3,
+                       alpha = 1.5,
+                       cg_rate = 2,
+                       verbose = 1,
+                       warm_start = 0,
+                       use_indirect=False)
+    return stg_default
+
+def solve(data, cone, **settings):
+    stg = default_settings()
+    stg.update(settings)
+
+    # todo: decide if we should overwrite data with modified matrices
+    data = check_data(data)
+    #todo: check that cones are good
+    if stg['use_indirect']:
+        return solve_indir(data, cone, stg)
+    else:
+        return solve_dir(data, cone, stg)
 
 def not_met(*vargs):
     return not all(vargs)
