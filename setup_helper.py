@@ -67,11 +67,17 @@ def get_blas_lapack_info():
 
     if not info:
         print("Trying using blas_opt / lapack_opt")
-        info = from_system_info(['blas_opt', 'lapack_opt'])
+        try:
+            info = from_system_info(['blas_opt', 'lapack_opt'])
+        except:
+            print('blas_opt/lapack_opt exception caught')
 
     if not info:
-        print("blas_opt / lapack_opt failed, trying blas / lapack")
-        info = from_system_info(['blas', 'lapack'])
+        print("blas_opt / lapack_opt failed. trying blas / lapack")
+        try:
+            info = from_system_info(['blas', 'lapack'])
+        except:
+            print('blas/lapack exception caught')
 
     if info:
         info['define_macros'] += [('LAPACK_LIB_FOUND', None)]

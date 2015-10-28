@@ -13,7 +13,6 @@ in `src/scs`
 
 # TODO
 - i get an error with `python setup.py` having to do with numpy includes; maybe I should be catching it and continue on...
-- check and convert scipy sparse matrices for input
 - do memory checks
 - check that options works as expected
 - how to package: `setup.py` can't import cython without adding cython as dependency? sub command?
@@ -22,6 +21,11 @@ in `src/scs`
     - hidden modules
     - `__init__.py`
     - figure out and simplify
+- tests for proper exceptions
+- memory checks
+- python 3
+- installer
+- blas location and wrapping of exceptions
 
 # scipy/cython C integer types
 https://github.com/scikit-learn/scikit-learn/wiki/C-integer-types:-the-missing-manual
