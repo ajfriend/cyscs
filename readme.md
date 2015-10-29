@@ -44,3 +44,21 @@ prob = cvx.Problem(cvx.Maximize(cvx.log(x)), [x >= 1, x <= 10])
 
 # scipy/cython C integer types
 https://github.com/scikit-learn/scikit-learn/wiki/C-integer-types:-the-missing-manual
+
+# packaging/distributing/compilation/building
+- http://docs.cython.org/src/userguide/source_files_and_compilation.html
+- http://docs.cython.org/src/reference/compilation.html
+- http://docs.cython.org/src/quickstart/build.html
+- http://stackoverflow.com/questions/4505747/how-should-i-structure-a-python-package-that-contains-cython-code
+
+# profiling
+- http://docs.cython.org/src/tutorial/profiling_tutorial.html
+- [memory allocation](http://docs.cython.org/src/tutorial/memory_allocation.html)
+
+# Wed Oct 28 15:25:22 2015
+- tests
+- organize dir structure
+- building without cython
+- ask brendan about numpy
+- fix numpy order
+- sdists/wheels?
