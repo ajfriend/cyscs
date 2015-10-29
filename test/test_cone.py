@@ -10,7 +10,7 @@ def test_repr():
     d = dict(f=1, l=20, ep=4, ed=7, q=[3,4,9,10], s=[3,2,4], p=[.1, -.7])
     c = scs.Cone(**d)
 
-    exec 'c2 = scs.' + str(c)
+    c2 = eval('scs.' + str(c))
 
     assert c == c2
 

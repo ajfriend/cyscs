@@ -8,6 +8,7 @@
 .Python
 *.pyc
 env/
+env3/
 build/
 develop-eggs/
 dist/

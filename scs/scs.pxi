@@ -6,7 +6,12 @@ from cpython.object cimport Py_EQ, Py_NE
 
 def version():
     cdef char* c_string = scs_version()
-    return c_string
+    # c_string comes out as a bytes object, which won't compare with a string without first converting
+    try:
+        return str(c_string, encoding='UTF-8')
+    except:
+        return c_string
+
 
 
 # IDEA: scs_solve interface is simple, the cached interface is a little more
