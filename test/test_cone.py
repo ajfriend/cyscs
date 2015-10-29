@@ -1,63 +1,90 @@
 from __future__ import print_function
-
+import scs
 import pytest
 
-import numpy as np
-import scipy.sparse as sp
-
-import util
-
-
-def test_import():
-    import scs
-
 def test_cone():
-    import scs
-    d = dict(f=1, l=20, ep=4, ed=7, q=[3,4,9,10], s=[0,1,4], p=[.1, -.7])
+    d = dict(f=1, l=20, ep=4, ed=7, q=[3,4,9,10], s=[3,2,4], p=[.1, -.7])
     print(scs.Cone(**d))
 
-def test_version():
-    import scs
-    import pkg_resources
+def test_repr():
+    d = dict(f=1, l=20, ep=4, ed=7, q=[3,4,9,10], s=[3,2,4], p=[.1, -.7])
+    c = scs.Cone(**d)
 
-    print(scs.version())
-    print(pkg_resources.require("scs")[0].version)
-    assert scs.version() == pkg_resources.require("scs")[0].version
+    exec 'c2 = scs.' + str(c)
 
-def test_simple():
-    import scs
-    data, cone = util.simple_lp()
+    assert c == c2
 
-    print('test simple: \n')
-    sol = scs.solve(data, cone, eps=1e-9, alpha=.1)
+def test_eq():
+    c = scs.Cone(f=1,l=3)
+    c2 = scs.Cone(f=1,l=4)
 
-def test_extra_arg():
-    data, cone = util.simple_lp()
-    import scs
-    sol = scs.solve(data, cone, eps=1e-9, alpha=.1, nonsense_arg='nonsense')
+    assert c != c2
 
-def test_simple_indirect():
-    data, cone = util.simple_lp()
-    import scs
-    sol = scs.solve(data, cone, eps=1e-9, alpha=.1, use_indirect=True)
+def test_invalid_leq():
+    c = scs.Cone(f=1,l=3)
+    c2 = scs.Cone(f=1,l=4)
 
-def test_simple_direct():
-    data, cone = util.simple_lp()
-    import scs
-    sol = scs.solve(data, cone, eps=1e-9, alpha=.1, use_indirect=False)
+    with pytest.raises(SyntaxError):
+        c < c2
 
-# todo: assert that this raises a value error
-def test_cone_size():
-    data, cone = util.simple_lp()
-    cone['l'] = 5
+def test_invalid_eq():
+    c = scs.Cone(f=1,l=3)
 
-    import scs
+    with pytest.raises(SyntaxError):
+        c >= 4
 
-    with pytest.raises(ValueError):
-        sol = scs.solve(data, cone)
+def test_diff_cones():
+    c = scs.Cone(f=1,l=3)
+    c2 = scs.Cone(f=1,l=4,p=[.1,.4])
 
-def test_simple_ecp():
-    data, cone = util.simple_ecp()
-    import scs
-    sol = scs.solve(data, cone)
+    assert c != c2
 
+def test_diff_cones():
+    c = scs.Cone(f=1,l=3, p=[.10001, .4])
+    c2 = scs.Cone(f=1,l=4,p=[.1,.4])
+
+    assert c != c2
+
+def test_size_f():
+    n = 13
+    c = scs.Cone(f=n)
+
+    assert len(c) == n
+
+def test_size_l():
+    n = 13
+    c = scs.Cone(l=n)
+
+    assert len(c) == n
+
+def test_size_ep():
+    n = 13
+    c = scs.Cone(ep=n)
+
+    assert len(c) == 3*n
+
+def test_size_ed():
+    n = 13
+    c = scs.Cone(ed=n)
+
+    assert len(c) == 3*n
+
+def test_size_q():
+    n = 13
+    m = 3
+    c = scs.Cone(q=[n,m])
+
+    assert len(c) == n+m
+
+def test_size_s():
+    n = 13
+    m = 3
+    c = scs.Cone(s=[n,m])
+
+    assert len(c) == (n*(n+1))/2 + (m*(m+1))/2
+
+def test_size_p():
+    a = [-.4, .7]
+    c = scs.Cone(p=a)
+
+    assert len(c) == 3*len(a)

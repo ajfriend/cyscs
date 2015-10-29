@@ -2,6 +2,7 @@ import numpy as np
 cimport numpy as cnp # todo: what do i need cimport numpy for?
 # use the python malloc/free to have the memory attributed to python.
 #from cpython.mem cimport PyMem_Malloc, PyMem_Free
+from cpython.object cimport Py_EQ, Py_NE
 
 def version():
     cdef char* c_string = scs_version()
@@ -65,6 +66,7 @@ cdef AMatrix make_amatrix(scs_float[:] data, scs_int[:] ind, scs_int[:] indptr, 
     return cA
 
 cdef class Cone:
+    # todo: validate input data: -1 <= p <= 1; q,s have positive integer elements,...
     cdef:
         _Cone _cone
         cnp.ndarray q, s, p
@@ -78,31 +80,27 @@ cdef class Cone:
                               p=NULL,
                               psize=0)
 
-        #todo: get rid of the weird branch for empty arrays
-        # just have the pointer point to the empyt numpy array memory with zero size
-        if q is not None and len(q) > 0:
-            self.q = np.array(q, dtype=np.int64)
-            self.q.flags.writeable = False
-            self._cone.q = <scs_int *>self.q.data
-            self._cone.qsize = len(self.q)
-        else:
-            self.q = np.array([], dtype=np.int64)
-            
-        if s is not None and len(s) > 0:
-            self.s = np.array(s, dtype=np.int64)
-            self.s.flags.writeable = False
-            self._cone.s = <scs_int *>self.s.data
-            self._cone.ssize = len(self.s)
-        else:
-            self.s = np.array([], dtype=np.int64)
-            
-        if p is not None and len(p) > 0:
-            self.p = np.array(p, dtype=np.float64)
-            self.p.flags.writeable = False
-            self._cone.p = <scs_float *>self.p.data
-            self._cone.psize = len(self.p)
-        else:
-            self.p = np.array([], dtype=np.float64)
+        if q is None:
+            q = []
+        self.q = np.array(q, dtype=np.int64)
+        self.q.flags.writeable = False
+        self._cone.q = <scs_int *>self.q.data
+        self._cone.qsize = len(self.q)
+
+        if s is None:    
+            s = []
+        self.s = np.array(s, dtype=np.int64)
+        self.s.flags.writeable = False
+        self._cone.s = <scs_int *>self.s.data
+        self._cone.ssize = len(self.s)
+
+        if p is None:
+            p = []
+        self.p = np.array(p, dtype=np.float64)
+        self.p.flags.writeable = False
+        self._cone.p = <scs_float *>self.p.data
+        self._cone.psize = len(self.p)
+
             
     def __len__(self):
         cdef scs_int total = 0
@@ -117,7 +115,6 @@ cdef class Cone:
 
             
     def todict(self):
-        # todo: do i need the empty lists?
         d = {}
         if self._cone.f > 0:
             d['f'] = self._cone.f
@@ -157,5 +154,37 @@ cdef class Cone:
     
     def __str__(self):
         return repr(self)
+
+    def __richcmp__(x, y, int op):
+        cdef:
+            Cone a, b
+        if op == Py_EQ:
+            if isinstance(x, Cone) and isinstance(y, Cone):
+                a = x
+                b = y
+                if a._cone.f != b._cone.f:
+                    return False
+                if a._cone.l != b._cone.l:
+                    return False
+                if a._cone.ep != b._cone.ep:
+                    return False
+                if a._cone.ed != b._cone.ed:
+                    return False
+                if (a.q != b.q).any():
+                    return False
+                if (a.s != b.s).any():
+                    return False
+                if (a.p != b.p).any():
+                    return False
+
+                return True
+            else:
+                return False
+
+
+        elif op == Py_NE:
+            return not (x == y)
+        else:
+            raise SyntaxError("Can only compare Cone to another Cone for equality.")
         
 
