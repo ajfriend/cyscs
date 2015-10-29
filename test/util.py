@@ -13,10 +13,32 @@ def simple_lp():
     return dict(A=A,b=b,c=c), cone
 
 def simple_socp():
-    pass
+    A = sp.csc_matrix([[-1.,  0.,  0.],
+                       [ 0., -1.,  0.],
+                       [ 0.,  0., -1.],
+                       [-1.,  0.,  0.],
+                       [ 0., -1.,  0.]])
+    A.indices = A.indices.astype(np.int64)
+    A.indptr = A.indptr.astype(np.int64)
+    c = np.array([ 0.,  0.,  1.], dtype=np.float64)
+    b = np.array([-1., -1., -0., -0., -0.], dtype=np.float64)
+    cone = {'l': 2, 'q': [3]}
+
+    return dict(A=A,b=b,c=c), cone
 
 def simple_sdp():
-    pass
+    A = sp.csc_matrix([[ 1.,  0.        ,  0.],
+                       [ 0.,  0.        ,  1.],
+                       [-1.,  0.        ,  0.],
+                       [ 0., -np.sqrt(2),  0.],
+                       [ 0.,  0.        , -1.]])
+    A.indices = A.indices.astype(np.int64)
+    A.indptr = A.indptr.astype(np.int64)
+    c = np.array([0, 1, 0], dtype=np.float64)
+    b = np.array([1, 1, 0, 0, 0], dtype=np.float64)
+    cone = {'l': 2, 's': [2]}
+
+    return dict(A=A,b=b,c=c), cone
 
 def simple_ecp():
     A = sp.csc_matrix([[ 1.,  0.],
@@ -28,5 +50,17 @@ def simple_ecp():
     c = np.array([ 0., -1.], dtype=np.float64)
     b = np.array([ 1., -0.,  1., -0.], dtype=np.float64)
     cone = {'l': 1, 'ep': 1}
+
+    return dict(A=A,b=b,c=c), cone
+
+def simple_pcp():
+    A = sp.csc_matrix([[0,1,0],[0,0,1],[-1,0,0],[0,-1,0],[0,0,-1]], dtype=np.float64)
+    A.indices = A.indices.astype(np.int64)
+    A.indptr = A.indptr.astype(np.int64)
+    b = np.array([1,-2,0,0,0], dtype=np.float64)
+    c = np.array([1,0,0], dtype=np.float64)
+    cone = dict(f=1,l=1,p=[.3])
+
+    expected_x = np.array([2**(1/.3), 1, -2])
 
     return dict(A=A,b=b,c=c), cone
