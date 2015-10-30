@@ -56,7 +56,6 @@ https://github.com/scikit-learn/scikit-learn/wiki/C-integer-types:-the-missing-m
 # Wed Oct 28 15:25:22 2015
 - organize dir structure
 - building without cython
-- ask brendan about numpy/blas (flow chart of situations)
 - fix numpy order
 - sdists/wheels?
 - clean up check_data function
