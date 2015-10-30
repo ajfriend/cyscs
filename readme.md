@@ -9,6 +9,7 @@ Cython interface for SCS
 - [SCS C library](https://github.com/cvxgrp/scs) is incorporated as a submodule
 in `src/scs`
 - update the SCS submodule by going to `src/scs` and running `git pull`
+- inside virtualenv, run cvxpy tests with `nosetests cvxpy`, making sure both nose and scs are pointing to the proper locations
 
 
 # TODO
@@ -59,6 +60,7 @@ https://github.com/scikit-learn/scikit-learn/wiki/C-integer-types:-the-missing-m
 - tests
 - organize dir structure
 - building without cython
-- ask brendan about numpy
+- ask brendan about numpy/blas (flow chart of situations)
 - fix numpy order
 - sdists/wheels?
+- warm start functionality and tests

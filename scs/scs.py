@@ -20,15 +20,15 @@ def default_settings():
     # todo: would be nice to grab defaults from C, but Cython doesn't
     # actually read C headerfiles, so it can't get the SCS macros
     # however, is possible if defaults are exposed as variables or function
-    stg_default = dict(normalize = 1,
-                       scale = 1,
+    stg_default = dict(normalize = True,
+                       scale = 1.0,
                        rho_x = 1e-3,
                        max_iters = 2500,
                        eps = 1e-3,
                        alpha = 1.5,
-                       cg_rate = 2,
-                       verbose = 1,
-                       warm_start = 0,
+                       cg_rate = 2.0,
+                       verbose = True,
+                       warm_start = False,
                        use_indirect=False)
     return stg_default
 
@@ -49,6 +49,7 @@ def solve(data, cone, **settings):
     cone = Cone(**cone)
 
     # todo: decide if we should overwrite data with modified matrices
+    # woah! wipes the 'data' dictionary
     data = check_data(data, cone)
 
     return solve_(data, cone, stg)
@@ -106,5 +107,7 @@ def check_data(data, cone):
         raise ValueError('The cones must match the number of rows of A.')
 
     # return modified data if we needed to convert anything
-    data = dict(A=A,b=b,c=c)
+    data = dict(data) # make a shallow copy of the dictionary
+
+    data.update(A=A,b=b,c=c)
     return data

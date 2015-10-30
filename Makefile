@@ -10,7 +10,6 @@ reinstall: clean
 	pip install -e .
 
 # can run -vs, where s makes it not capture output
-# Using --strict as an argument to py.test will turn Python warnings into errors
 # the -l flag will print out a list of local variables with their corresponding values when a test fails
 test:
 	py.test test -vl

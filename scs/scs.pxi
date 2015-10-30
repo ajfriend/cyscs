@@ -46,7 +46,11 @@ def solve(dict data, Cone cone, dict settings):
     cdef Data _data = Data(m, n, &_A, &b[0], &c[0], &_settings)
 
     # todo: sol prep should be done at python level?
-    sol = dict(x=np.zeros(n), y=np.zeros(m), s=np.zeros(m))
+    if 'sol' in data:
+        sol = data['sol']
+    else:
+        sol = dict(x=np.zeros(n), y=np.zeros(m), s=np.zeros(m))
+
     cdef Sol _sol = make_sol(sol['x'], sol['y'], sol['s'])
 
     cdef Info _info
