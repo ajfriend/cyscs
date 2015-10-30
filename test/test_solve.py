@@ -42,3 +42,10 @@ def test_simple_sdp():
 def test_simple_pcp():
     data, cone = util.simple_pcp()
     sol = scs.solve(data, cone)
+
+
+def test_str_output():
+    data, cone = util.simple_lp()
+    sol = scs.solve(data, cone)
+
+    assert sol['info']['status'] == 'Solved'

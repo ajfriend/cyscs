@@ -76,7 +76,9 @@ setup(name='scs',
         url = 'http://github.com/cvxgrp/scs',
         description='scs: splitting conic solver',
         packages=['scs'],
-        ext_modules=cythonize(extensions),
+        # cython compiler directives so that Cython automatically converts C strings to Python strings in python 2/3
+        # otherwise, we will get byte strings in Python 3, which is not what CVXPY is expecting
+        ext_modules=cythonize(extensions, compiler_directives={'c_string_type':'unicode', 'c_string_encoding':'utf8'}),
         install_requires=["numpy >= 1.7","scipy >= 0.13.2"],
         license = "MIT",
         long_description=("Solves convex cone programs via operator splitting. "
