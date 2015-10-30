@@ -2,6 +2,9 @@ import scs
 import pytest
 import util
 
+import scipy.sparse as sp
+import numpy as np
+
 def test_simple_lp():
     data, cone = util.simple_lp()
     sol = scs.solve(data, cone)
@@ -49,3 +52,28 @@ def test_str_output():
     sol = scs.solve(data, cone)
 
     assert sol['info']['status'] == 'Solved'
+
+def test_ecp():
+    """ From problem:
+
+    a = .3
+    x = cvx.Variable()
+    prob = cvx.Problem(cvx.Minimize(cvx.exp(a*x)-x))
+    prob.solve(solver='SCS')
+    true_x = -np.log(a)/a
+
+    """
+
+    a = .4 # can vary a > 0
+    A = sp.csc_matrix([ [-a,  0. ],
+                        [ 0. ,  0. ],
+                        [ 0. , -1. ]])
+    b = np.array([-0.,  1., -0.])
+    c = np.array([-1.,  1.])
+    cone = dict(ep=1)
+    data = dict(A=A,b=b,c=c)
+
+    true_x = np.array([-np.log(a)/a, 1.0/a])
+    sol = scs.solve(data, cone, verbose=False, eps=1e-6)
+
+    assert np.allclose(sol['x'], true_x)
