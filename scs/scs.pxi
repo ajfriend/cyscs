@@ -9,21 +9,6 @@ def version():
     return c_string
 
 
-
-# IDEA: scs_solve interface is simple, the cached interface is a little more
-# complicated, with the data input only updating what's necessary.
-
-# maybe I don't even need the c function scs? maybe just do it for error checking?
-
-# todo: assume 64bit int, and double.
-# todo: do we have to convert CSC to 64 bit int?
-# todo: coppying of data and ownership issues....
-
-# todo: check for correct data format and convert if needed (all python)
-# make direct and indirect versions, and call the appropriate one
-# split into python and cython modules (as little code as possible in cython?)
-
-
 def solve(dict data, Cone cone, dict settings):
     """ Call the C function scs().
 

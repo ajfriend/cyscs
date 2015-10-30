@@ -10,10 +10,6 @@ from warnings import warn
 import scipy.sparse as sp
 import numpy as np
 
-# can i install with 'python setup.py' outside of a virtualenv?
-# can i do the numpy install after the fact?
-
-# todo: add some tests that these checks do the right thing
 
 def default_settings():
     # todo: note that unrecognized keyword argument settings are silently ignored?

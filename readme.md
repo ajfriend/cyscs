@@ -21,11 +21,8 @@ in `src/scs`
     - hidden modules
     - `__init__.py`
     - figure out and simplify
-- tests for proper exceptions
 - memory checks
-- python 3
 - installer
-- add power cone support
 
 # blas warning
 I get this when i run `python setup.py install`:
@@ -57,10 +54,9 @@ https://github.com/scikit-learn/scikit-learn/wiki/C-integer-types:-the-missing-m
 - [memory allocation](http://docs.cython.org/src/tutorial/memory_allocation.html)
 
 # Wed Oct 28 15:25:22 2015
-- tests
 - organize dir structure
 - building without cython
 - ask brendan about numpy/blas (flow chart of situations)
 - fix numpy order
 - sdists/wheels?
-- warm start functionality and tests
+- clean up check_data function
