@@ -59,3 +59,27 @@ https://github.com/scikit-learn/scikit-learn/wiki/C-integer-types:-the-missing-m
 - fix numpy order
 - sdists/wheels?
 - clean up check_data function
+
+# packaging
+- [do i need manifest.ini](http://stackoverflow.com/questions/24727709/i-dont-understand-python-manifest-in)
+- [package structure and testpypi](http://pymbook.readthedocs.org/en/latest/projectstructure.html)
+- http://python-packaging-user-guide.readthedocs.org/en/latest/distributing/
+- [sdist distutils notes](https://docs.python.org/2/distutils/sourcedist.html)
+- [setuptools](https://pythonhosted.org/setuptools/setuptools.html)
+- [distutils setup script](https://docs.python.org/3.5/distutils/setupscript.html)
+- [config file](https://docs.python.org/2/distutils/configfile.html)
+- [distributing python modules](https://docs.python.org/2.7/distutils/index.html)
+- [parameter into setup.py](http://stackoverflow.com/questions/677577/distutils-how-to-pass-a-user-defined-parameter-to-setup-py)
+- [pip docs](https://pip.readthedocs.org/en/stable/)
+
+# Sun Nov  1 15:36:07 2015
+- If pip does not find a wheel to install, it will locally build a wheel and cache it for future installs, instead of rebuilding the source distribution in the future
+- [packaging directory structure example](https://docs.python.org/2.7/distutils/examples.html#pure-python-distribution-by-package)
+- [single extension module example](https://docs.python.org/2.7/distutils/examples.html#single-extension-module)
+- [listing packages](https://docs.python.org/2.7/distutils/setupscript.html#listing-whole-packages)
+- [extension package structure](https://docs.python.org/2.7/distutils/setupscript.html#extension-names-and-packages)
+
+## plan
+- so i think I can build the extension modules wherever I want by [prepending the package name](https://docs.python.org/2/distutils/setupscript.html#extension-names-and-packages)
+- will that work with cython
+- can I then hide the internal extension modules with __all__?

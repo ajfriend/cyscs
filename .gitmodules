@@ -1,4 +1,1 @@
 
-[submodule "src/scs"]
-	path = src/scs
-	url = https://github.com/cvxgrp/scs.git
