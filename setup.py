@@ -1,6 +1,5 @@
 from setuptools import setup, Extension
 from platform import system
-from Cython.Build import cythonize
 import copy
 from collections import defaultdict
 from setup_helper import glober, add_blas_lapack_info
@@ -20,6 +19,13 @@ USE_64_BIT_BLAS = False
 ext = defaultdict(list)
 
 # ext['define_macros'] += [('EXTRAVERBOSE', 999)] # for debugging
+try:
+    from Cython.Build import cythonize
+    USE_CYTHON = True
+except:
+    USE_CYTHON = False
+
+file_ext = '.pyx' if USE_CYTHON else '.c'
 
 if system() == 'Linux':
     ext['libraries'] += ['rt']
@@ -53,20 +59,24 @@ ext['include_dirs'] += [numpy.get_include()]
 ext_direct = copy.deepcopy(ext)
 # next two names need to match
 ext_direct['name'] = 'scs._direct'
-ext_direct['sources'] += ['scs/_direct.pyx']
+ext_direct['sources'] += ['scs/_direct' + file_ext]
 ext_direct['sources'] += glober(rootDir, ['linsys/direct/*.c', 'linsys/direct/external/*.c'])
 ext_direct['include_dirs'] += glober(rootDir, ['linsys/direct/', 'linsys/direct/external/'])
 
 
 ext_indirect = copy.deepcopy(ext)
 ext_indirect['name'] = 'scs._indirect'
-ext_indirect['sources'] += ['scs/_indirect.pyx']
+ext_indirect['sources'] += ['scs/_indirect' + file_ext]
 ext_indirect['sources'] += glober(rootDir, ['linsys/indirect/*.c'])
 ext_indirect['include_dirs'] += glober(rootDir, ['linsys/indirect/'])
 ext_indirect['define_macros'] += [('INDIRECT', None)]
 
 extensions = [Extension(**ext_direct),
               Extension(**ext_indirect)]
+
+if USE_CYTHON:
+    from Cython.Build import cythonize
+    extensions = cythonize(extensions, compiler_directives={'c_string_type':'unicode', 'c_string_encoding':'utf8'})
 
 
 setup(name='scs',
@@ -78,7 +88,7 @@ setup(name='scs',
         packages=['scs'],
         # cython compiler directives so that Cython automatically converts C strings to Python strings in python 2/3
         # otherwise, we will get byte strings in Python 3, which is not what CVXPY is expecting
-        ext_modules=cythonize(extensions, compiler_directives={'c_string_type':'unicode', 'c_string_encoding':'utf8'}),
+        ext_modules=extensions,
         install_requires=["numpy >= 1.7","scipy >= 0.13.2"],
         license = "MIT",
         long_description=("Solves convex cone programs via operator splitting. "

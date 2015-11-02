@@ -7,8 +7,6 @@
 # Distribution / packaging
 .Python
 *.pyc
-env/
-env3/
 build/
 develop-eggs/
 dist/
@@ -23,3 +21,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+
+env/
+env3/
+env_test/
