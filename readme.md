@@ -99,3 +99,6 @@ https://github.com/scikit-learn/scikit-learn/wiki/C-integer-types:-the-missing-m
 - not sure why it isn't finding extension modules...
 - when i run setup.py with pyhton or pip and use cython, see where it puts everything in the virtualenv. see if the tests are there. what other files. see if i can run tests. make sure that a 'github' install will work for people
 - good example setup.py: https://github.com/marcelm/cutadapt/blob/master/setup.py
+- this guy doesn't like using sys.argv for --cython: http://stackoverflow.com/questions/677577/distutils-how-to-pass-a-user-defined-parameter-to-setup-py
+- http://blog.ionelmc.ro/2014/05/25/python-packaging/
+- http://blog.ionelmc.ro/2014/06/25/python-packaging-pitfalls/

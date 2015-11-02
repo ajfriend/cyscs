@@ -4,4 +4,3 @@
 include setup_helper.py
 graft c/scs/linsys
 graft c/scs/include
-graft test
