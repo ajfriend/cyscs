@@ -98,3 +98,4 @@ https://github.com/scikit-learn/scikit-learn/wiki/C-integer-types:-the-missing-m
 - move test into package folder hopefully lets us run `py.test scs` after installing
 - not sure why it isn't finding extension modules...
 - when i run setup.py with pyhton or pip and use cython, see where it puts everything in the virtualenv. see if the tests are there. what other files. see if i can run tests. make sure that a 'github' install will work for people
+- good example setup.py: https://github.com/marcelm/cutadapt/blob/master/setup.py

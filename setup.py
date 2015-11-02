@@ -2,6 +2,7 @@ from setuptools import setup, Extension
 from platform import system
 import copy
 from collections import defaultdict
+import sys
 from setup_helper import glober, add_blas_lapack_info
 import numpy
 
@@ -19,11 +20,11 @@ USE_64_BIT_BLAS = False
 ext = defaultdict(list)
 
 # ext['define_macros'] += [('EXTRAVERBOSE', 999)] # for debugging
-try:
-    from Cython.Build import cythonize
+
+USE_CYTHON = False
+if '--cython' in sys.argv:
+    sys.argv.remove('--cython')
     USE_CYTHON = True
-except:
-    USE_CYTHON = False
 
 file_ext = '.pyx' if USE_CYTHON else '.c'
 
@@ -76,6 +77,8 @@ extensions = [Extension(**ext_direct),
 
 if USE_CYTHON:
     from Cython.Build import cythonize
+    # cython compiler directives so that Cython automatically converts C strings to Python strings in python 2/3
+    # otherwise, we will get byte strings in Python 3, which is not what CVXPY is expecting
     extensions = cythonize(extensions, compiler_directives={'c_string_type':'unicode', 'c_string_encoding':'utf8'})
 
 
@@ -86,15 +89,15 @@ setup(name='scs',
         url = 'http://github.com/cvxgrp/scs',
         description='scs: splitting conic solver',
         packages=['scs'],
-        # cython compiler directives so that Cython automatically converts C strings to Python strings in python 2/3
-        # otherwise, we will get byte strings in Python 3, which is not what CVXPY is expecting
+        
         ext_modules=extensions,
         install_requires=["numpy >= 1.7","scipy >= 0.13.2"],
         license = "MIT",
-        long_description=("Solves convex cone programs via operator splitting. "
-        "Can solve: linear programs (LPs), second-order cone programs (SOCPs), "
-        "semidefinite programs (SDPs), exponential cone programs (ECPs), and "
-        "power cone programs (PCPs), or problems with any combination of those "
-        "cones. See http://github.com/cvxgrp/scs for more details.")
+        long_description=("""
+Solves convex cone programs via operator splitting.
+Can solve: linear programs (LPs), second-order cone programs (SOCPs),
+semidefinite programs (SDPs), exponential cone programs (ECPs), and
+power cone programs (PCPs), or problems with any combination of those
+cones. See http://github.com/cvxgrp/scs for more details.""")
         )
 
