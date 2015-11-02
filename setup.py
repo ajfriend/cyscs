@@ -33,7 +33,7 @@ if USE_64_BIT_BLAS:
     ext['define_macros'] += [('BLAS64', None)]
 
 # location of SCS root directory, containing 'src/' etc.
-rootDir = 'src/scs/'
+rootDir = 'c/scs/'
 
 # collect the extension module options common to both direct and indirect versions
 ext['sources'] += glober(rootDir, ['src/*.c', 'linsys/*.c'])
