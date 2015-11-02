@@ -60,14 +60,14 @@ ext['include_dirs'] += [numpy.get_include()]
 ext_direct = copy.deepcopy(ext)
 # next two names need to match
 ext_direct['name'] = 'scs._direct'
-ext_direct['sources'] += ['scs/_direct' + file_ext]
+ext_direct['sources'] += ['src/scs/_direct' + file_ext]
 ext_direct['sources'] += glober(rootDir, ['linsys/direct/*.c', 'linsys/direct/external/*.c'])
 ext_direct['include_dirs'] += glober(rootDir, ['linsys/direct/', 'linsys/direct/external/'])
 
 
 ext_indirect = copy.deepcopy(ext)
 ext_indirect['name'] = 'scs._indirect'
-ext_indirect['sources'] += ['scs/_indirect' + file_ext]
+ext_indirect['sources'] += ['src/scs/_indirect' + file_ext]
 ext_indirect['sources'] += glober(rootDir, ['linsys/indirect/*.c'])
 ext_indirect['include_dirs'] += glober(rootDir, ['linsys/indirect/'])
 ext_indirect['define_macros'] += [('INDIRECT', None)]
@@ -89,7 +89,8 @@ setup(name='scs',
         url = 'http://github.com/cvxgrp/scs',
         description='scs: splitting conic solver',
         packages=['scs'],
-        
+        package_dir={'': 'src'},
+        zip_safe=False,
         ext_modules=extensions,
         install_requires=["numpy >= 1.7","scipy >= 0.13.2"],
         license = "MIT",
