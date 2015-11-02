@@ -85,3 +85,13 @@ https://github.com/scikit-learn/scikit-learn/wiki/C-integer-types:-the-missing-m
 - can I then hide the internal extension modules with __all__?
 - 10.1 in the cookbook
 - should i change the inner scs name to hide the implementation details?
+- this is the way to do it <https://github.com/cmcqueen/simplerandom/blob/master/python/setup.py>
+- looks like cythonize automatically includes the C files
+- header files aren't included: manifest?
+- just need to fix the setup.py to use the included C files
+- http://pymbook.readthedocs.org/en/latest/projectstructure.html
+- zip safe flag?
+- i think my `packages` listing of just `[scs]` is ok in setup.py
+- good article: <https://hynek.me/articles/sharing-your-labor-of-love-pypi-quick-and-dirty/>
+    - i like how he tests sdists with pip inside a virtualenv: `pip install dist/attrs-15.1.0.tar.gz`
+    - also good code on testing from pypi test server

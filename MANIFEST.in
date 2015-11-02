@@ -1,0 +1,4 @@
+# http://stackoverflow.com/questions/6633624/how-to-specify-header-files-in-setup-py-script-for-python-extension-module
+# https://docs.python.org/2/distutils/sourcedist.html#commands
+# http://stackoverflow.com/questions/4505747/how-should-i-structure-a-python-package-that-contains-cython-code
+include setup_helper.py

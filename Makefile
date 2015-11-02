@@ -1,4 +1,4 @@
-.PHONY: clean reinstall test all
+.PHONY: clean reinstall test all sdist
 
 all: reinstall test
 
@@ -13,3 +13,7 @@ reinstall: clean
 # the -l flag will print out a list of local variables with their corresponding values when a test fails
 test:
 	py.test test -vl
+
+sdist: clean
+	python setup.py sdist
+	tar -zxvf dist/scs-1.1.8.tar.gz -C dist/
