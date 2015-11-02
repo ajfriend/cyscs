@@ -83,3 +83,5 @@ https://github.com/scikit-learn/scikit-learn/wiki/C-integer-types:-the-missing-m
 - so i think I can build the extension modules wherever I want by [prepending the package name](https://docs.python.org/2/distutils/setupscript.html#extension-names-and-packages)
 - will that work with cython
 - can I then hide the internal extension modules with __all__?
+- 10.1 in the cookbook
+- should i change the inner scs name to hide the implementation details?
