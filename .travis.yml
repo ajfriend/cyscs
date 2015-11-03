@@ -8,7 +8,7 @@ before_install:
     - sudo apt-get update
     - sudo apt-get install python-numpy python-scipy python3-numpy python3-scipy
 install:
-  - pip install cython
-  - python setup.py install --cython
+  - sudo pip install cython
+  - sudo python setup.py install --cython
 script:
   - py.test test
