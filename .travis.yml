@@ -9,10 +9,14 @@ addons:
     - libblas-dev
     - liblapack-dev
     - gfortran
+    - python-numpy
+    - python-scipy
+    - python3-numpy
+    - python3-scipy
 before_install:
   - pip install -U pip setuptools
+  - pip install cython
 install:
-  - pip install cython numpy scipy
   - python setup.py install --cython
 script:
   - py.test test
