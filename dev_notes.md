@@ -11,6 +11,14 @@ in `src/scs`
 - update the SCS submodule by going to `src/scs` and running `git pull`
 - inside virtualenv, run cvxpy tests with `nosetests cvxpy`, making sure both nose and scs are pointing to the proper locations
 
+## git submodules
+`SCS` is contained as a submodule of `scs_python`. When cloning from
+github, the submodule doesn't seem to be automatically downloaded.
+To do so, use:
+- `git clone https://github.com/ajfriend/scs_python`
+- `cd scs_python`
+- `git submodule init`
+- `git submodule update`
 
 # TODO
 - do memory checks
