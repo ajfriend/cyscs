@@ -102,3 +102,11 @@ https://github.com/scikit-learn/scikit-learn/wiki/C-integer-types:-the-missing-m
 - this guy doesn't like using sys.argv for --cython: http://stackoverflow.com/questions/677577/distutils-how-to-pass-a-user-defined-parameter-to-setup-py
 - http://blog.ionelmc.ro/2014/05/25/python-packaging/
 - http://blog.ionelmc.ro/2014/06/25/python-packaging-pitfalls/
+
+# Mon Nov  2 15:43:53 2015
+- check that all ways to install work
+    - github
+    - sdist
+    - wheel
+    - with pip or setup.py
+- look at how toolz includes tests..
