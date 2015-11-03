@@ -4,8 +4,11 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
+before_install:
+    - sudo apt-get update
+    - sudo apt-get install python-numpy python-scipy python3-numpy python3-scipy
 install:
-  - "pip install numpy scipy pytest cython"
-  - "python setup.py install --cython"
+  - pip install cython
+  - python setup.py install --cython
 script:
-  - "py.test test"
+  - py.test test
