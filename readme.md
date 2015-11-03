@@ -110,3 +110,4 @@ https://github.com/scikit-learn/scikit-learn/wiki/C-integer-types:-the-missing-m
     - wheel
     - with pip or setup.py
 - look at how toolz includes tests..
+- good travis example and install from github: https://github.com/dnouri/nolearn

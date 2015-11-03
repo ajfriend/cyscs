@@ -1,14 +1,18 @@
 language: python
+sudo: false
 python:
   - "2.7"
-  - "3.3"
   - "3.4"
-  - "3.5"
+addons:
+  apt:
+    packages:
+    - libblas-dev
+    - liblapack-dev
+    - gfortran
 before_install:
-    - sudo apt-get update
-    - sudo apt-get install python-numpy python-scipy python3-numpy python3-scipy
+  - pip install -U pip setuptools
 install:
-  - sudo pip install cython
-  - sudo python setup.py install --cython
+  - pip install cython
+  - python setup.py install --cython
 script:
   - py.test test
