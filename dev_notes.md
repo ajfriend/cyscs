@@ -125,3 +125,53 @@ https://github.com/scikit-learn/scikit-learn/wiki/C-integer-types:-the-missing-m
 - manifest commands: https://docs.python.org/2/distutils/sourcedist.html#commands
 - https://hynek.me/articles/sharing-your-labor-of-love-pypi-quick-and-dirty/
 - `travis_wait` and `travis_retry`
+
+# Tue Nov  3 20:48:40 2015
+```
+In [6]: get_info?
+Signature: get_info(name, notfound_action=0)
+Docstring:
+notfound_action:
+  0 - do nothing
+  1 - display warning message
+  2 - raise error
+File:      /usr/local/lib/python3.5/site-packages/numpy/distutils/system_info.py
+Type:      function
+```
+
+- get_info on different pythons/platforms returns different errors/warnings
+- why a problem with linux but not osx?
+- inspect the output. see what i can copy over
+- everything but `language`?
+- look at scikit learn setup.py for tips/tricks
+- https://github.com/scikit-learn/scikit-learn/issues/5489
+- optimized atlas: http://docs.scipy.org/doc/numpy/user/install.html
+- http://scikit-learn.org/stable/modules/computational_performance.html#linear-algebra-libraries
+- https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/setup.py
+- on linux, be careful about the way you install libraries, because you may get an error like:
+```
+In [3]: get_info('lapack_opt', 1)
+/usr/lib/python2.7/dist-packages/numpy/distutils/system_info.py:1427: UserWarning:
+    Atlas (http://math-atlas.sourceforge.net/) libraries not found.
+    Directories to search for the libraries can be specified in the
+    numpy/distutils/site.cfg file (section [atlas]) or by setting
+    the ATLAS environment variable.
+  warnings.warn(AtlasNotFoundError.__doc__)
+Out[3]:
+{'define_macros': [('NO_ATLAS_INFO', 1)],
+```
+- are these two sufficient on osx, or do i have to go down to blas and lapack without opt?
+```
+In [6]: get_info('lapack_opt')
+Out[6]:
+{'define_macros': [('NO_ATLAS_INFO', 3), ('HAVE_CBLAS', None)],
+ 'extra_compile_args': ['-msse3'],
+ 'extra_link_args': ['-Wl,-framework', '-Wl,Accelerate']}
+
+In [7]: get_info('blas_opt')
+Out[7]:
+{'define_macros': [('NO_ATLAS_INFO', 3), ('HAVE_CBLAS', None)],
+ 'extra_compile_args': ['-msse3',
+  '-I/System/Library/Frameworks/vecLib.framework/Headers'],
+ 'extra_link_args': ['-Wl,-framework', '-Wl,Accelerate']}
+```

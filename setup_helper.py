@@ -24,33 +24,16 @@ def from_system_info(names):
     define_macros, include_dirs, library_dirs, libraries, extra_link_args, extra_compile_args
     """
 
-    info = defaultdict(list)
+    info = defaultdict(set)
 
     # add blas/lapack info
     for name in names: #'blas_opt', 'lapack_opt': #'blas', 'lapack'
-        d = get_info(name)
+        d = get_info(name, 0)
         for key in d:
-            info[key] += d[key]
+            if key in ['libraries', 'library_dirs', 'define_macros', 'include_dirs', 'extra_link_args', 'extra_compile_args']:
+                info[key].update(d[key])
 
-    return info
-
-
-def from_env():
-    """ Try to get blas/lapack info from environment variables.
-
-    Return a dictionary with the appropriate arguments
-    """
-    PATHS = 'BLAS_LAPACK_LIB_PATHS'
-    LIBS = 'BLAS_LAPACK_LIBS'
-
-    info = defaultdict(list)
-    if PATHS in os.environ:
-        info['library_dirs'] += os.environ[PATHS].split()
-
-    if LIBS in os.environ:
-        info['libraries'] += os.environ[LIBS].split()
-
-    return info
+    return {k: list(info[k]) for k in info}
 
 def get_blas_lapack_info():
     """ Try three methods for getting blas/lapack info.
@@ -60,24 +43,14 @@ def get_blas_lapack_info():
     If not successful, print error message and return empty dictionary
     """
     info = defaultdict(list)
-
-    if not info:
-        print("Trying using environment variables for blas/lapack libraries")
-        info = from_env()
-
+    
     if not info:
         print("Trying using blas_opt / lapack_opt")
-        try:
-            info = from_system_info(['blas_opt', 'lapack_opt'])
-        except:
-            print('blas_opt/lapack_opt exception caught')
+        info = from_system_info(['lapack_opt'])
 
     if not info:
         print("blas_opt / lapack_opt failed. trying blas / lapack")
-        try:
-            info = from_system_info(['blas', 'lapack'])
-        except:
-            print('blas/lapack exception caught')
+        info = from_system_info(['lapack'])
 
     if info:
         info['define_macros'] += [('LAPACK_LIB_FOUND', None)]
@@ -85,12 +58,6 @@ def get_blas_lapack_info():
         print("###############################################################################################")
         print("# failed to find blas/lapack libs, SCS cannot solve SDPs but can solve LPs, SOCPs, ECPs, PCPs #")
         print("# install blas/lapack and run this install script again to allow SCS to solve SDPs            #")
-        print("#                                                                                             #")
-        print("# scs will use environment variables BLAS_LAPACK_LIB_PATHS and BLAS_LAPACK_LIBS if set        #")
-        print("# use this to link against blas/lapack libs that scs can't find on it's own, usage ex:        #")
-        print("#        >> export BLAS_LAPACK_LIB_PATHS=/usr/lib/:/other/dir                                 #")
-        print("#        >> export BLAS_LAPACK_LIBS=blas:lapack                                               #")
-        print("#        >> python setup.py install                                                           #")
         print("###############################################################################################")
 
     return info
