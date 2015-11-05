@@ -13,11 +13,12 @@ addons:
     - python-scipy
     - python3-numpy
     - python3-scipy
-    - libatlas3-base
+    #- libatlas3-base
     - libatlas-base-dev
 before_install:
   - pip install -U pip setuptools
   - pip install cython
+  - pip install scipy
 install:
   - travis_wait python setup.py install --cython
 script:

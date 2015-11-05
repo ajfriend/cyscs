@@ -57,6 +57,7 @@ def get_blas_lapack_info():
 
     if info:
         info['define_macros'] += [('LAPACK_LIB_FOUND', None)]
+        print('the resulting info is: ', info)
     else:
         print("###############################################################################################")
         print("# failed to find blas/lapack libs, SCS cannot solve SDPs but can solve LPs, SOCPs, ECPs, PCPs #")
