@@ -19,6 +19,6 @@ before_install:
   - pip install -U pip setuptools
   - pip install cython
 install:
-  - python setup.py install --cython
+  - travis_wait python setup.py install --cython
 script:
   - py.test test
