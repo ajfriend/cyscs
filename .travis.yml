@@ -19,9 +19,10 @@ addons:
     - libatlas-dev
     - libatlas-base-dev
 before_install:
-  - pip install -U pip setuptools pytest
+  - pip install -U pip setuptools pytest wheel
   - pip install -U cython
-  - travis_wait pip install scipy
+  - travis_wait pip install -U numpy
+  - travis_wait pip install -U scipy
 install:
   - travis_wait python setup.py install --cython
 script:
