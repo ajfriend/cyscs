@@ -5,6 +5,11 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
+
+env:
+  - SDIST=true
+  - SDIST=false
+
 addons:
   apt:
     packages:
@@ -20,8 +25,8 @@ before_install:
 install:
   - travis_wait python setup.py install --cython
 script:
-  - py.test src/scs/test
-  - py.test --pyargs scs
+  - py.test src/scs/test # run tests from github repo
+  - py.test --pyargs scs # make sure that tests can run from installed package
 cache:
   - apt
   - directories:
