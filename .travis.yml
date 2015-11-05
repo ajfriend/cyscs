@@ -8,13 +8,13 @@ addons:
     packages:
     - libblas-dev
     - liblapack-dev
-    #- gfortran
+    - gfortran
     #- python-numpy
     #- python-scipy
     #- python3-numpy
     #- python3-scipy
-    #- libatlas3-base
-    #- libatlas-base-dev
+    - libatlas3-base
+    - libatlas-base-dev
 before_install:
   - pip install -U pip setuptools pytest
   - pip install -U cython
