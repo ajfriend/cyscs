@@ -13,6 +13,7 @@ addons:
     - liblapack-dev
     - libatlas-dev
     - libatlas-base-dev
+    - python-scipy # not sure if needed, but makes sure all deps are present
 before_install:
   - pip install -U pip setuptools pytest
   - pip install -U cython

@@ -178,3 +178,6 @@ Out[7]:
 
 # Wed Nov  4 15:54:41 2015
 - make the sdp test bigger than 2x2
+- absolute best travis.yml example: https://github.com/dnouri/nolearn/blob/master/.travis.yml
+- try running tests on osx: https://github.com/astropy/astropy/blob/master/.travis.yml
+- osx lapack/Accelerate framework weirdness: https://github.com/scikit-learn/scikit-learn/issues/5489
