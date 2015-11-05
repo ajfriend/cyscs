@@ -13,8 +13,8 @@ addons:
     - python-scipy
     - python3-numpy
     - python3-scipy
-    #- libatlas3-base
-    #- libatlas-base-dev (this one really messed up by boxs)
+    - libatlas3-base
+    - libatlas-base-dev
 before_install:
   - pip install -U pip setuptools
   - pip install cython

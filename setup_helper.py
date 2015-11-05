@@ -33,7 +33,10 @@ def from_system_info(names):
             if key in ['libraries', 'library_dirs', 'define_macros', 'include_dirs', 'extra_link_args', 'extra_compile_args']:
                 info[key].update(d[key])
 
-    return {k: list(info[k]) for k in info}
+    info = {k: list(info[k]) for k in info}
+    tmp = defaultdict(list)
+    tmp.update(info)
+    return tmp
 
 def get_blas_lapack_info():
     """ Try three methods for getting blas/lapack info.
@@ -48,7 +51,7 @@ def get_blas_lapack_info():
         print("Trying using blas_opt / lapack_opt")
         info = from_system_info(['lapack_opt'])
 
-    if not info:
+    if (not info) or ('NO_ATLAS_INFO' in [x[0] for x in info['define_macros']]):
         print("blas_opt / lapack_opt failed. trying blas / lapack")
         info = from_system_info(['lapack'])
 

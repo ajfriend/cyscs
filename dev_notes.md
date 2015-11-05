@@ -175,3 +175,6 @@ Out[7]:
   '-I/System/Library/Frameworks/vecLib.framework/Headers'],
  'extra_link_args': ['-Wl,-framework', '-Wl,Accelerate']}
 ```
+
+# Wed Nov  4 15:54:41 2015
+- make the sdp test bigger than 2x2
