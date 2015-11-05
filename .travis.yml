@@ -6,14 +6,10 @@ python:
 addons:
   apt:
     packages:
+    - gfortran
     - libblas-dev
     - liblapack-dev
-    - gfortran
-    #- python-numpy
-    #- python-scipy
-    #- python3-numpy
-    #- python3-scipy
-    - libatlas3-base
+    - libatlas-dev
     - libatlas-base-dev
 before_install:
   - pip install -U pip setuptools pytest
