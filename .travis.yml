@@ -8,17 +8,16 @@ addons:
     packages:
     - libblas-dev
     - liblapack-dev
-    - gfortran
-    - python-numpy
-    - python-scipy
-    - python3-numpy
-    - python3-scipy
+    #- gfortran
+    #- python-numpy
+    #- python-scipy
+    #- python3-numpy
+    #- python3-scipy
     #- libatlas3-base
-    - libatlas-base-dev
+    #- libatlas-base-dev
 before_install:
-  - pip install -U pip setuptools
-  - pip install cython
-  - pip install -U pytest
+  - pip install -U pip setuptools pytst
+  - pip install -U cython
   - travis_wait pip install scipy
 install:
   - travis_wait python setup.py install --cython
