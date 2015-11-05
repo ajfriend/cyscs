@@ -7,7 +7,7 @@ A Python interface, written in Cython, for [SCS](https://github.com/cvxgrp/scs),
 
 ## Usage
 The usage is currently identical to the existing SCS Python interface: 
-```
+```python
 import scs
 sol = scs(data, cone, **options)
 ```

@@ -20,7 +20,8 @@ before_install:
 install:
   - travis_wait python setup.py install --cython
 script:
-  - py.test test
+  - py.test src/scs/test
+  - py.test --pyargs scs
 cache:
   - apt
   - directories:

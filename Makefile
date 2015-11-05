@@ -12,7 +12,7 @@ reinstall: clean
 # can run -vs, where s makes it not capture output
 # the -l flag will print out a list of local variables with their corresponding values when a test fails
 test:
-	py.test test -vl
+	py.test --pyargs scs -vl
 
 sdist: clean
 	python setup.py sdist --cython
