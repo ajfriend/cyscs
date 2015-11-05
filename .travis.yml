@@ -19,3 +19,7 @@ install:
   - travis_wait python setup.py install --cython
 script:
   - py.test test
+cache:
+  - apt
+  - directories:
+    - $HOME/.cache/pip
