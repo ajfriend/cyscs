@@ -18,7 +18,8 @@ addons:
 before_install:
   - pip install -U pip setuptools
   - pip install cython
-  - pip install scipy
+  - pip install -U pytest
+  - travis_wait pip install scipy
 install:
   - travis_wait python setup.py install --cython
 script:
