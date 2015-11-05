@@ -24,7 +24,8 @@ before_install:
   - travis_wait pip install -U numpy
   - travis_wait pip install -U scipy
 install:
-  - travis_wait python setup.py install --cython
+  - if [[ $SDIST == true ]]; then python setup.py sdist --cython && find ./dist -iname "*.gz" | xargs -0 pip install; fi
+  - if [[ $SDIST == false ]]; then python setup.py install --cython; fi
 script:
   - py.test src/scs/test # run tests from github repo
   - py.test --pyargs scs # make sure that tests can run from installed package
@@ -32,3 +33,4 @@ cache:
   - apt
   - directories:
     - $HOME/.cache/pip
+    
