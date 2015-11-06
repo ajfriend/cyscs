@@ -6,13 +6,21 @@ def simple_lp():
     A = sp.csc_matrix(([-1.,-1.,1.,1.], ij), (4,4))
     A.indices = A.indices.astype(np.int64)
     A.indptr = A.indptr.astype(np.int64)
-    b = np.array([0.,0.,1,1], dtype=np.float64)
-    c = np.array([1.,1.,-1,-1], dtype=np.float64)
+    b = np.array([0,0,1,1], dtype=np.float64)
+    c = np.array([1,1,-1,-1], dtype=np.float64)
     cone = {'l': 4}
 
     return dict(A=A,b=b,c=c), cone
 
 def simple_socp():
+    """
+    from model:
+
+    ```
+    x = cvx.Variable(2)
+    prob = cvx.Problem(cvx.Minimize(cvx.norm(x)), [x >= 1])
+    ```
+    """
     A = sp.csc_matrix([[-1.,  0.,  0.],
                        [ 0., -1.,  0.],
                        [ 0.,  0., -1.],
@@ -24,34 +32,64 @@ def simple_socp():
     b = np.array([-1., -1., -0., -0., -0.], dtype=np.float64)
     cone = {'l': 2, 'q': [3]}
 
+    true_x = np.array([1,1], dtype=np.float64)
+
     return dict(A=A,b=b,c=c), cone
 
 def simple_sdp():
-    A = sp.csc_matrix([[ 1.,  0.        ,  0.],
-                       [ 0.,  0.        ,  1.],
-                       [-1.,  0.        ,  0.],
-                       [ 0., -np.sqrt(2),  0.],
-                       [ 0.,  0.        , -1.]])
+    """
+    from model:
+    ```
+    X = cvx.Semidef(3)
+    prob = cvx.Problem(cvx.Minimize(X[0,1] + X[0,2]), [X[0,0] <= 1, X[1,1] <= 1, X[2,2] <= 1])
+    prob.get_problem_data('SCS')
+    ```
+    """
+    sq = -np.sqrt(2)
+    A = sp.csc_matrix([[ 1,  0,  0,  0,  0,  0],
+                       [ 0,  0,  0,  1,  0,  0],
+                       [ 0,  0,  0,  0,  0,  1],
+                       [-1,  0,  0,  0,  0,  0],
+                       [ 0, sq,  0,  0,  0,  0],
+                       [ 0,  0, sq,  0,  0,  0],
+                       [ 0,  0,  0, -1,  0,  0],
+                       [ 0,  0,  0,  0, sq,  0],
+                       [ 0,  0,  0,  0,  0, -1]], dtype=np.float64)
     A.indices = A.indices.astype(np.int64)
     A.indptr = A.indptr.astype(np.int64)
-    c = np.array([0, 1, 0], dtype=np.float64)
-    b = np.array([1, 1, 0, 0, 0], dtype=np.float64)
-    cone = {'l': 2, 's': [2]}
+    c = np.array([0, 1, 1, 0, 0, 0], dtype=np.float64)
+    b = np.array([1, 1, 1, 0, 0, 0, 0, 0, 0], dtype=np.float64)
+    cone = {'l': 3, 's': [3]}
+
+    true_x = np.array([ 1, -1, -1, 1, 1, 1], dtype=np.float64)
 
     return dict(A=A,b=b,c=c), cone
 
 def simple_ecp():
-    A = sp.csc_matrix([[ 1.,  0.],
-                       [ 0., -1.],
-                       [ 0.,  0.],
-                       [-1.,  0.]])
-    A.indices = A.indices.astype(np.int64)
-    A.indptr = A.indptr.astype(np.int64)
-    c = np.array([ 0., -1.], dtype=np.float64)
-    b = np.array([ 1., -0.,  1., -0.], dtype=np.float64)
-    cone = {'l': 1, 'ep': 1}
+    """
+    From model:
+    ```
+    a = .3
+    x = cvx.Variable()
+    prob = cvx.Problem(cvx.Minimize(cvx.exp(a*x)-x))
+    prob.solve(solver='SCS')
+    true_x = -np.log(a)/a
+    ```
+    """
 
-    return dict(A=A,b=b,c=c), cone
+    a = .4 # can vary a > 0
+    A = sp.csc_matrix([ [-a,  0. ],
+                        [ 0. ,  0. ],
+                        [ 0. , -1. ]])
+    b = np.array([-0.,  1., -0.])
+    c = np.array([-1.,  1.])
+    cone = dict(ep=1)
+    data = dict(A=A,b=b,c=c)
+
+    true_x = np.array([-np.log(a)/a, 1.0/a])
+
+    return data, cone, true_x
+
 
 def many_iter_ecp():
     """ ECP that should take ~640 iters to solve at default settings
@@ -78,6 +116,8 @@ def many_iter_ecp():
     b = np.array([ 1., -5., -0.,  1., -0., -0.,  1., -0.], dtype=np.float64)
     cone = {'f':1, 'l': 1, 'ep': 2}
 
+    true_x = np.array([5, -4], dtype=np.float64)
+
     return dict(A=A,b=b,c=c), cone
 
 def simple_pcp():
@@ -88,6 +128,6 @@ def simple_pcp():
     c = np.array([1,0,0], dtype=np.float64)
     cone = dict(f=1,l=1,p=[.3])
 
-    expected_x = np.array([2**(1/.3), 1, -2])
+    true_x = np.array([2**(1/.3), 1, -2])
 
     return dict(A=A,b=b,c=c), cone

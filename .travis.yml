@@ -5,11 +5,9 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
-
 env:
-  - SDIST=true
-  - SDIST=false
-
+  - SDIST=true # make and install from sdist
+  - SDIST=false # install directly from setup.py install --cython
 addons:
   apt:
     packages:
@@ -27,10 +25,9 @@ install:
   - if [[ $SDIST == true ]]; then python setup.py sdist --cython && find ./dist -iname "*.gz" | xargs -0 pip install; fi
   - if [[ $SDIST == false ]]; then python setup.py install --cython; fi
 script:
-  - py.test src/scs/test # run tests from github repo
-  - py.test --pyargs scs # make sure that tests can run from installed package
+  - py.test src/scs/test # run tests directly from test folder
+  - py.test --pyargs scs # make sure that tests can run from installed package (as if user pip installed)
 cache:
   - apt
   - directories:
     - $HOME/.cache/pip
-    
