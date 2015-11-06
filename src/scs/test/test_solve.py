@@ -37,16 +37,22 @@ def test_simple_ecp():
     assert np.allclose(sol['x'], true_x)
 
 def test_simple_socp():
-    data, cone = util.simple_socp()
-    sol = scs.solve(data, cone)
+    data, cone, true_x = util.simple_socp()
+    sol = scs.solve(data, cone, eps=1e-6)
+
+    assert np.allclose(sol['x'], true_x)
 
 def test_simple_sdp():
-    data, cone = util.simple_sdp()
-    sol = scs.solve(data, cone)
+    data, cone, true_x = util.simple_sdp()
+    sol = scs.solve(data, cone, eps=1e-6)
+
+    assert np.allclose(sol['x'], true_x)
 
 def test_simple_pcp():
-    data, cone = util.simple_pcp()
-    sol = scs.solve(data, cone)
+    data, cone, true_x = util.simple_pcp()
+    sol = scs.solve(data, cone, eps=1e-6)
+
+    assert np.allclose(sol['x'], true_x)
 
 
 def test_str_output():

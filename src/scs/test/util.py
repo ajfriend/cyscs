@@ -32,9 +32,9 @@ def simple_socp():
     b = np.array([-1., -1., -0., -0., -0.], dtype=np.float64)
     cone = {'l': 2, 'q': [3]}
 
-    true_x = np.array([1,1], dtype=np.float64)
+    true_x = np.array([1,1, np.sqrt(2)], dtype=np.float64)
 
-    return dict(A=A,b=b,c=c), cone
+    return dict(A=A,b=b,c=c), cone, true_x
 
 def simple_sdp():
     """
@@ -63,7 +63,7 @@ def simple_sdp():
 
     true_x = np.array([ 1, -1, -1, 1, 1, 1], dtype=np.float64)
 
-    return dict(A=A,b=b,c=c), cone
+    return dict(A=A,b=b,c=c), cone, true_x
 
 def simple_ecp():
     """
@@ -130,4 +130,4 @@ def simple_pcp():
 
     true_x = np.array([2**(1/.3), 1, -2])
 
-    return dict(A=A,b=b,c=c), cone
+    return dict(A=A,b=b,c=c), cone, true_x

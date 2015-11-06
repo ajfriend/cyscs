@@ -4,7 +4,7 @@ import util
 
 
 def test_warm():
-    data, cone = util.simple_pcp()
+    data, cone, true_x = util.simple_pcp()
 
     # computing a fresh solution takes some number of iters
     sol = scs.solve(data, cone, warm_start = False)
