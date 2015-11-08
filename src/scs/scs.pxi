@@ -5,7 +5,7 @@ cimport numpy as cnp # todo: what do i need cimport numpy for?
 from cpython.object cimport Py_EQ, Py_NE
 
 def version():
-    cdef char* c_string = scs_version()
+    cdef const char* c_string = scs_version()
     return c_string
 
 
