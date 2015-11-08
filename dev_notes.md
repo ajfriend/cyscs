@@ -182,3 +182,9 @@ Out[7]:
 - try running tests on osx: https://github.com/astropy/astropy/blob/master/.travis.yml
 - osx lapack/Accelerate framework weirdness: https://github.com/scikit-learn/scikit-learn/issues/5489
 - http://pablissimo.com/381/get-travis-ci-to-do-your-python-packaging-tests-for-you
+
+# memory profiling
+- http://www.slideshare.net/PiotrPrzymus/pprzymus-europython-2014
+- https://pypi.python.org/pypi/memory_profiler
+- http://codrspace.com/durden/profiling-memory-usage-in-python/
+- http://ianozsvald.com/2014/07/18/ipython-memory-usage-interactive-tool/
