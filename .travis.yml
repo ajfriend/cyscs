@@ -1,8 +1,8 @@
-language: python
+language: c
 sudo: false
 os:
   - linux
-  - osx
+#  - osx
 python:
   - "2.7"
   - "3.3"
