@@ -1,10 +1,10 @@
 import scs
 import pytest
-import util
+import scs.examples as ex
 
 
 def test_warm():
-    data, cone, true_x = util.simple_pcp()
+    data, cone, true_x = ex.simple_pcp()
 
     # computing a fresh solution takes some number of iters
     sol = scs.solve(data, cone, warm_start = False)
@@ -27,7 +27,7 @@ def test_warm():
 
 def test_many_iter_ecp():
     # warm starting with the previously found solution should take 0 iterations
-    data, cone = util.many_iter_ecp()
+    data, cone = ex.many_iter_ecp()
     sol = scs.solve(data, cone, warm_start = False)
     assert sol['info']['iter'] >= 500
 
@@ -39,7 +39,7 @@ def test_many_iter_ecp():
 def test_many_iter_ecp_tol():
     # warm starting with a solution at a lower tolerance should reduce
     # the number of iterations needed
-    data, cone = util.many_iter_ecp()
+    data, cone = ex.many_iter_ecp()
 
     # intially takes ~920 iters for eps 1e-4
     sol = scs.solve(data, cone, warm_start = False, eps=1e-4)
