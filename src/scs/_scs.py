@@ -2,9 +2,11 @@ from ._direct import Cone, version
 
 from ._direct import Cone as Cone_dir
 from ._direct import solve as solve_dir
+from ._direct import Workspace as work_dir
 
 from ._indirect import Cone as Cone_indir
 from ._indirect import solve as solve_indir
+from ._indirect import Workspace as work_indir
 
 from warnings import warn
 import scipy.sparse as sp
@@ -113,15 +115,30 @@ class Workspace(object):
         """ 
         data may contain 'sol' key
         """
-        self.data, self.cone = check_data(data, cone)
         self.settings = default_settings()
         self.settings.update(settings)
-        m, n = A.shape
+
+        # # todo: can pass in the wrong cone and its confusing!
+        # # this is weird, should just be a dict
+        # if self.settings['use_indirect']:
+        #     cone = Cone_indir(**cone)
+        # else:
+        #     cone = Cone_dir(**cone)
+
+        self.cone = cone
+        self.data = check_data(data, Cone(**cone))
+        
+        m, n = data['A'].shape
         if 'sol' in data:
             self.sol = data[sol]
         else:
             self.sol = dict(x=np.zeros(n), y=np.zeros(m), s=np.zeros(m))
         # todo: fixed parameters: rho, normalize, ...
+
+        if self.settings['use_indirect']:
+            self._work = work_indir(self.data, self.cone, self.settings)
+        else:
+            self._work = work_dir(self.data, self.cone, self.settings)
 
     def check_settings(self):
         # make sure settings are OK. replace them
@@ -130,8 +147,15 @@ class Workspace(object):
 
     def solve(self, data, **settings):
         self.settings.update(settings)
-        check_settings()
+        self.check_settings()
         for key in 'sol', 'b', 'c':
             if key in data:
                 self.data[key] = data[key]
+
+        self._work.solve(self.data, self.sol, self.settings)
+
+        sol = dict(self.sol)
+        sol['info'] = self._work.info
+
+        return sol
 

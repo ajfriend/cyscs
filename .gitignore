@@ -25,3 +25,4 @@ var/
 env/
 env3/
 env_test/
+.cache/

@@ -178,10 +178,11 @@ cdef class Cone:
             raise SyntaxError("Can only compare Cone to another Cone for equality.")
         
 cdef class Workspace:
-    cdef:
+    cdef: #private by default, 'readonly' to make public
         Work * _work
         Settings settings
-        Info info
+
+        readonly Info info
         AMatrix _A
 
         Data _data
@@ -189,7 +190,7 @@ cdef class Workspace:
         Cone cone
 
 
-    def __cinit__(self, dict data, dict settings):
+    def __cinit__(self, dict data, dict cone, dict settings):
         self.settings = settings
 
         A = data['A']
@@ -202,7 +203,9 @@ cdef class Workspace:
         cdef scs_float[:] c = data['c']
 
         self._data = Data(m, n, &self._A, &b[0], &c[0], &self.settings)
-        self.cone = Cone(data['cones'])
+
+        # todo: do i convert at this point?
+        self.cone = Cone(**cone)
 
         self._work = scs_init(&self._data, &self.cone._cone, &self.info)
 
@@ -227,4 +230,5 @@ cdef class Workspace:
         cdef scs_int status
         status = scs_solve(self._work, &self._data, &self.cone._cone, &_sol, &self.info)
 
-        return status, sol
+        print 'info: ', self.info
+        #return status, sol
