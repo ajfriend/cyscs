@@ -17,6 +17,10 @@ cdef extern from "linSys.h":
 cdef extern from "scs.h":
     scs_int scs(const Data* d, const _Cone* k, Sol* sol, Info* info)
     const char * scs_version()
+    
+    Work * scs_init(const Data* d, const _Cone* k, Info* info)
+    scs_int scs_solve(Work* w, const Data* d, const _Cone* k, Sol* sol, Info* info)
+    void scs_finish(Work * w)
 
     struct SCS_SETTINGS:
         scs_int normalize

@@ -107,3 +107,31 @@ def check_data(data, cone):
 
     data.update(A=A,b=b,c=c)
     return data
+
+class Workspace(object):
+    def __init__(self, data, cone, **settings):
+        """ 
+        data may contain 'sol' key
+        """
+        self.data, self.cone = check_data(data, cone)
+        self.settings = default_settings()
+        self.settings.update(settings)
+        m, n = A.shape
+        if 'sol' in data:
+            self.sol = data[sol]
+        else:
+            self.sol = dict(x=np.zeros(n), y=np.zeros(m), s=np.zeros(m))
+        # todo: fixed parameters: rho, normalize, ...
+
+    def check_settings(self):
+        # make sure settings are OK. replace them
+        # if not
+        pass
+
+    def solve(self, data, **settings):
+        self.settings.update(settings)
+        check_settings()
+        for key in 'sol', 'b', 'c':
+            if key in data:
+                self.data[key] = data[key]
+

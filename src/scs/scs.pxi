@@ -4,6 +4,7 @@ cimport numpy as cnp # todo: what do i need cimport numpy for?
 #from cpython.mem cimport PyMem_Malloc, PyMem_Free
 from cpython.object cimport Py_EQ, Py_NE
 
+
 def version():
     cdef const char* c_string = scs_version()
     return c_string
@@ -171,10 +172,59 @@ cdef class Cone:
             else:
                 return False
 
-
         elif op == Py_NE:
             return not (x == y)
         else:
             raise SyntaxError("Can only compare Cone to another Cone for equality.")
         
+cdef class Workspace:
+    cdef:
+        Work * _work
+        Settings settings
+        Info info
+        AMatrix _A
 
+        Data _data
+        # could probably move Cone up to python
+        Cone cone
+
+
+    def __cinit__(self, dict data, dict settings):
+        self.settings = settings
+
+        A = data['A']
+        cdef scs_int m, n
+        m,n = A.shape
+
+        self._A = make_amatrix(A.data, A.indices, A.indptr, m, n)
+
+        cdef scs_float[:] b = data['b']
+        cdef scs_float[:] c = data['c']
+
+        self._data = Data(m, n, &self._A, &b[0], &c[0], &self.settings)
+        self.cone = Cone(data['cones'])
+
+        self._work = scs_init(&self._data, &self.cone._cone, &self.info)
+
+        if self._work == NULL: 
+            raise MemoryError("Memory error in allocating Workspace.")
+
+    def __dealloc__(self):
+        if self._work != NULL:
+            scs_finish(self._work);
+
+    def solve(self, dict data, dict sol, dict settings):
+        cdef scs_float[:] b = data['b']
+        cdef scs_float[:] c = data['c']
+
+        self.settings = settings
+        self._data.stgs = &self.settings
+        self._data.b = &b[0]
+        self._data.c = &c[0]
+        
+        cdef Sol _sol = make_sol(sol['x'], sol['y'], sol['s'])
+
+        cdef scs_int status
+        status = scs_solve(self._work, &self._data, &self.cone._cone, &_sol, &self.info)
+
+        return status, sol
