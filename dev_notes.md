@@ -198,3 +198,5 @@ Out[7]:
 - throw exceptions? which to ignore?
 - make ipython notebook of example usage
 - 1e-3 + 1e-4 = 1e-4 (in solve times, with warm starting!)
+- make cython object more clearly take in dependencies
+- work.fixed to show fixed settings

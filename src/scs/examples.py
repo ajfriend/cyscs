@@ -132,7 +132,7 @@ def simple_pcp():
 
     return dict(A=A,b=b,c=c), cone, true_x
 
-def l1(size=50):
+def l1(size=50, seed=0):
     """ Solve random least-l1 norm problem.
 
     Data is for problem:
@@ -143,7 +143,7 @@ def l1(size=50):
     """
     p = 50 * size
     q = 25 * size
-    np.random.seed(0)
+    np.random.seed(seed)
 
     A = sp.rand(q, p, 0.01)
     Ae = sp.hstack([A, sp.csc_matrix((q, p))], format="csc")

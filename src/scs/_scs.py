@@ -116,19 +116,15 @@ def check_data(data, cone):
     return data
 
 class Workspace(object):
+    _fixed_keys = 'use_indirect', 'rho_x', 'normalize', 'scale'
+
     def __init__(self, data, cone, sol=None, **settings):
         """ SCS Workspace
         
         """
-        self.settings = default_settings()
-        self.settings.update(settings)
-
-        # # todo: can pass in the wrong cone and its confusing!
-        # # this is weird, should just be a dict
-        # if self.settings['use_indirect']:
-        #     cone = Cone_indir(**cone)
-        # else:
-        #     cone = Cone_dir(**cone)
+        self._settings = default_settings()
+        self._settings.update(settings)
+        self._fixed = {k: self._settings[k] for k in self._fixed_keys}
 
         self.cone = cone
         self.data = check_data(data, Cone(**cone))
@@ -141,18 +137,30 @@ class Workspace(object):
         # todo: fixed parameters: rho, normalize, ...
 
         if self.settings['use_indirect']:
-            self._work = work_indir(self.data, self.cone, self.settings)
+            self._work = work_indir(self.data, self.cone, self._settings)
         else:
-            self._work = work_dir(self.data, self.cone, self.settings)
+            self._work = work_dir(self.data, self.cone, self._settings)
+
+    @property
+    def fixed(self):
+        # return a copy of the fixed dictionary
+        return dict(self._fixed)
 
     @property
     def info(self):
         return self._work.info
 
+    @property
+    def settings(self):
+        self.check_settings()
+        return self._settings
+
+    # in fixed, can list (data, 'A') and test that it points to the right numpy array
+    # (cone) also fixed
     def check_settings(self):
-        # make sure settings are OK. replace them
-        # if not
-        pass
+        for key in self._fixed:
+            if not self._fixed[key] == self._settings[key]:
+                raise Exception('Setting {} has been changed from Workspace initialization.'.format(key))
 
     def solve(self, data=None, sol=None, **settings):
         self.settings.update(settings)
