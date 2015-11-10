@@ -10,7 +10,7 @@ def version():
     return c_string
 
 
-def solve(dict data, Cone cone, dict settings):
+def solve(dict data, Cone cone, dict sol, dict settings):
     """ Call the C function scs().
 
     """
@@ -26,12 +26,6 @@ def solve(dict data, Cone cone, dict settings):
     cdef Settings _settings = settings
 
     cdef Data _data = Data(m, n, &_A, &b[0], &c[0], &_settings)
-
-    # todo: sol prep should be done at python level?
-    if 'sol' in data:
-        sol = data['sol']
-    else:
-        sol = dict(x=np.zeros(n), y=np.zeros(m), s=np.zeros(m))
 
     cdef Sol _sol = make_sol(sol['x'], sol['y'], sol['s'])
 
@@ -216,6 +210,8 @@ cdef class Workspace:
         if self._work != NULL:
             scs_finish(self._work);
 
+    # todo: reduce the signature to just the data that we actualy need
+    # dont need all of data, just b, c
     def solve(self, dict data, dict sol, dict settings):
         cdef scs_float[:] b = data['b']
         cdef scs_float[:] c = data['c']

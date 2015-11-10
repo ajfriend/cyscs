@@ -30,7 +30,7 @@ def default_settings():
                        use_indirect=False)
     return stg_default
 
-def solve(data, cone, **settings):
+def solve(data, cone, sol=None, **settings):
     stg = default_settings()
     stg.update(settings)
 
@@ -50,7 +50,12 @@ def solve(data, cone, **settings):
     # woah! wipes the 'data' dictionary
     data = check_data(data, cone)
 
-    return solve_(data, cone, stg)
+    # todo: sol prep should be done at python level?
+    if sol is None:
+        m, n = data['A'].shape
+        sol = dict(x=np.zeros(n), y=np.zeros(m), s=np.zeros(m))
+
+    return solve_(data, cone, sol, stg)
 
 def not_met(*vargs):
     return not all(vargs)
@@ -111,7 +116,7 @@ def check_data(data, cone):
     return data
 
 class Workspace(object):
-    def __init__(self, data, cone, **settings):
+    def __init__(self, data, cone, sol=None, **settings):
         """ 
         data may contain 'sol' key
         """
@@ -129,10 +134,10 @@ class Workspace(object):
         self.data = check_data(data, Cone(**cone))
         
         m, n = data['A'].shape
-        if 'sol' in data:
-            self.sol = data[sol]
-        else:
+        if sol is None:
             self.sol = dict(x=np.zeros(n), y=np.zeros(m), s=np.zeros(m))
+        else:
+            self.sol = sol            
         # todo: fixed parameters: rho, normalize, ...
 
         if self.settings['use_indirect']:
@@ -140,22 +145,31 @@ class Workspace(object):
         else:
             self._work = work_dir(self.data, self.cone, self.settings)
 
+    @property
+    def info(self):
+        return self._work.info
+
     def check_settings(self):
         # make sure settings are OK. replace them
         # if not
         pass
 
-    def solve(self, data, **settings):
+    def solve(self, data=None, sol=None, **settings):
         self.settings.update(settings)
         self.check_settings()
-        for key in 'sol', 'b', 'c':
-            if key in data:
-                self.data[key] = data[key]
+
+        if data is not None:
+            for key in 'b', 'c':
+                if key in data:
+                    self.data[key] = data[key]
+
+        if sol:
+            self.sol = sol
 
         self._work.solve(self.data, self.sol, self.settings)
 
-        sol = dict(self.sol)
-        sol['info'] = self._work.info
+        result = dict(self.sol)
+        result['info'] = self.info
 
-        return sol
+        return result
 
