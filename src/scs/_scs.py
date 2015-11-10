@@ -174,7 +174,7 @@ class Workspace(object):
         if sol:
             self.sol = sol
 
-        self._work.solve(self.data, self.sol, self.settings)
+        self._work.solve(self.data['b'], self.data['c'], self.sol, self.settings)
 
         result = dict(self.sol)
         result['info'] = self.info

@@ -210,12 +210,7 @@ cdef class Workspace:
         if self._work != NULL:
             scs_finish(self._work);
 
-    # todo: reduce the signature to just the data that we actualy need
-    # dont need all of data, just b, c
-    def solve(self, dict data, dict sol, dict settings):
-        cdef scs_float[:] b = data['b']
-        cdef scs_float[:] c = data['c']
-
+    def solve(self, scs_float[:] b, scs_float[:] c, dict sol, dict settings):
         self.settings = settings
         self._data.stgs = &self.settings
         self._data.b = &b[0]
@@ -225,6 +220,3 @@ cdef class Workspace:
 
         cdef scs_int status
         status = scs_solve(self._work, &self._data, &self.cone._cone, &_sol, &self.info)
-
-        print 'info: ', self.info
-        #return status, sol
