@@ -131,3 +131,32 @@ def simple_pcp():
     true_x = np.array([2**(1/.3), 1, -2])
 
     return dict(A=A,b=b,c=c), cone, true_x
+
+def l1(size=50):
+    """ Solve random least-l1 norm problem.
+
+    Data is for problem:
+
+    min. ||x||_1
+    s.t. Ax = b
+
+    """
+    p = 50 * size
+    q = 25 * size
+    np.random.seed(0)
+
+    A = sp.rand(q, p, 0.01)
+    Ae = sp.hstack([A, sp.csc_matrix((q, p))], format="csc")
+    h = np.zeros(2 * p)
+    b = np.random.randn(q)
+    bt = np.hstack([b, h])  # in cone formulation
+    c = np.hstack([np.zeros(p), np.ones(p)])
+    I = sp.eye(p)
+    G = sp.vstack([sp.hstack([I, -I]), sp.hstack([-I, -I])], format="csc")
+    At = sp.vstack([Ae, G], format="csc")  # in cone formulation
+
+    data = {'A': At, 'b': bt, 'c': c}
+    cone = {'l': 2 * p, 'f': q}
+    #opts = {'normalize': True}
+
+    return data, cone, None

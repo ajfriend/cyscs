@@ -188,3 +188,13 @@ Out[7]:
 - https://pypi.python.org/pypi/memory_profiler
 - http://codrspace.com/durden/profiling-memory-usage-in-python/
 - http://ianozsvald.com/2014/07/18/ipython-memory-usage-interactive-tool/
+
+# Mon Nov  9 23:58:42 2015
+## TODO
+- normalize=False seems to work better on the l1 example!
+- check distance to solution?
+- check for bad change to workspace
+- make tests for bad changes to workspace
+- throw exceptions? which to ignore?
+- make ipython notebook of example usage
+- 1e-3 + 1e-4 = 1e-4 (in solve times, with warm starting!)

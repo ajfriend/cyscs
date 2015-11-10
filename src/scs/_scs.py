@@ -117,8 +117,8 @@ def check_data(data, cone):
 
 class Workspace(object):
     def __init__(self, data, cone, sol=None, **settings):
-        """ 
-        data may contain 'sol' key
+        """ SCS Workspace
+        
         """
         self.settings = default_settings()
         self.settings.update(settings)
