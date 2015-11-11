@@ -159,6 +159,8 @@ def l1(m=100, seed=0):
     I = sp.eye(n)
     G = sp.vstack([sp.hstack([I, -I]), sp.hstack([-I, -I])], format="csc")
     At = sp.vstack([Ae, G], format="csc")  # in cone formulation
+    At.indices = At.indices.astype(np.int64)
+    At.indptr = At.indptr.astype(np.int64)
 
     data = {'A': At, 'b': bt, 'c': c}
     cone = {'l': 2 * n, 'f': m}
@@ -167,4 +169,4 @@ def l1(m=100, seed=0):
     # the unstuffed problem data
     extra = dict(C=C,d=d)
 
-    return data, cone, extra
+    return data, cone
