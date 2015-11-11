@@ -3,10 +3,26 @@
 
 A Python interface, written in Cython, for [SCS](https://github.com/cvxgrp/scs), a numerical optimization package in C for solving convex cone problems.
 
+SCS solves convex cone programs via operator splitting.
+It can solve: linear programs (LPs), second-order cone programs (SOCPs),
+semidefinite programs (SDPs), exponential cone programs (ECPs), and
+power cone programs (PCPs), or problems with any combination of these
+cones.
+
 Most users will not interact with SCS directly. The most common use-case is as
 a back-end to a convex optimization modeling tool like [CVXPY](http://www.cvxpy.org).
 
-Advanced users can consult the interface notes below. For more complete definitions of the input data format, convex cones, and output variables, please see the [SCS README](https://github.com/cvxgrp/scs/blob/master/README.md).
+Advanced users can consult the interface notes below or the [tutorial IPython notebook](tutorial.ipynb). For more complete definitions of the input data format, convex cones, and output variables, please see the [`SCS README`](https://github.com/cvxgrp/scs/blob/master/README.md).
+
+## Installation
+### Pip
+- XXX: not yet uploaded to PyPI, so `pip` won't work
+- `pip install scs`
+
+### `setup.py`
+Users can also install via by cloning this GitHub repo and running
+`python setup.py install --cython`. This method requires that the user
+has Cython installed (`pip install cython`).
 
 ## Usage
 The usage is almost identical to the existing SCS Python interface: 
