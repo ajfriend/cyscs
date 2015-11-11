@@ -163,7 +163,7 @@ class Workspace(object):
                 raise Exception('Setting {} has been changed from Workspace initialization.'.format(key))
 
     def solve(self, data=None, sol=None, **settings):
-        self.settings.update(settings)
+        self._settings.update(settings)
         self.check_settings()
 
         if data is not None:

@@ -132,31 +132,39 @@ def simple_pcp():
 
     return dict(A=A,b=b,c=c), cone, true_x
 
-def l1(size=50, seed=0):
+def l1(m=100, seed=0):
     """ Solve random least-l1 norm problem.
 
     Data is for problem:
 
     min. ||x||_1
-    s.t. Ax = b
+    s.t. Cx = d
 
+    C is m by n, with n = 2*m
+    C is sparse, with each element 10 percent chance of nonzero
+
+    Note: if m is too small, C may have a row of all zeros, making the problem infeasible
+
+    todo: why does normalization seem to hurt?
     """
-    p = 50 * size
-    q = 25 * size
+    n = 2*m
     np.random.seed(seed)
 
-    A = sp.rand(q, p, 0.01)
-    Ae = sp.hstack([A, sp.csc_matrix((q, p))], format="csc")
-    h = np.zeros(2 * p)
-    b = np.random.randn(q)
-    bt = np.hstack([b, h])  # in cone formulation
-    c = np.hstack([np.zeros(p), np.ones(p)])
-    I = sp.eye(p)
+    C = sp.rand(m, n, 0.1, format='csc')
+    Ae = sp.hstack([C, sp.csc_matrix((m, n))], format="csc")
+    h = np.zeros(2 * n)
+    d = np.random.randn(m)
+    bt = np.hstack([d, h])  # in cone formulation
+    c = np.hstack([np.zeros(n), np.ones(n)])
+    I = sp.eye(n)
     G = sp.vstack([sp.hstack([I, -I]), sp.hstack([-I, -I])], format="csc")
     At = sp.vstack([Ae, G], format="csc")  # in cone formulation
 
     data = {'A': At, 'b': bt, 'c': c}
-    cone = {'l': 2 * p, 'f': q}
+    cone = {'l': 2 * n, 'f': m}
     #opts = {'normalize': True}
 
-    return data, cone, None
+    # the unstuffed problem data
+    extra = dict(C=C,d=d)
+
+    return data, cone, extra
