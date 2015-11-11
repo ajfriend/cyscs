@@ -31,13 +31,6 @@ import scs
 result = scs.solve(data, cone, sol=None, **settings)
 ```
 
-For backwards compatibility, we also provide an `scs.scs()` alias to `scs.solve()`:
-
-```python
-import scs
-result = scs.scs(data, cone, sol=None, **settings)
-```
-
 We describe the arguments briefly below. For more detail, please see the [`SCS README`](https://github.com/cvxgrp/scs/blob/master/README.md).
 
 - `data` is a Python `dict` with keys:
