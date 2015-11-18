@@ -8,32 +8,17 @@ import cvxpy as cvx
 from collections import defaultdict
 import scs
 
-def cvx_solve():
-    m = 128
-    n = 10
-    np.random.seed(1)
-    A = np.random.randn(m, n)
-    b = np.random.randn(m)
+data, cone = scs.examples.l1(500)
+#data, cone, _ = scs.examples.simple_socp()
 
-    # Construct the problem.
-    x = cvx.Variable(n)
-    objective = cvx.Minimize(cvx.norm(A*x - b))
-    constraints = [0 <= x, x <= 1]
-    prob = cvx.Problem(objective, constraints)
-    prob.solve('SCS')
 
 def scs_data():
-    #data, cone = scs.examples.l1(500)
-    data, cone, _ = scs.examples.simple_socp()
+    pass
 
 def scs_solve():
-    #data, cone = scs.examples.l1(500)
-    data, cone, _ = scs.examples.simple_socp()
     scs.solve(data, cone, verbose=False)
 
 def scs_work():
-    #data, cone = scs.examples.l1(500)
-    data, cone, _ = scs.examples.simple_socp()
     work = scs.Workspace(data, cone, verbose=False)
     work.solve()
 
@@ -47,7 +32,7 @@ def ver():
     s = scs.version()
 
 
-def test(funcs, n=10):
+def test(funcs, n=100):
     # run a few times to get any ancillary objects created
     for i in range(3):
         for f in funcs:
@@ -68,6 +53,6 @@ def test(funcs, n=10):
         yield (a.max() - a.min())/n
 
 #funcs = scs_solve, scs_data, dummy, scs_solve, scs_data, cvx_solve, scs_solve, cvx_solve
-funcs = dummy, ver, scs_data, scs_solve, scs_work
+funcs = dummy, ver, scs_data, scs_work, scs_solve
 
 print list(test(funcs))
