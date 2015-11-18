@@ -13,31 +13,6 @@ def glober(root, names):
         out += glob(root + name)
     return out
 
-def from_system_info(names):
-    """ Retreive info from `numpy.distutils.system_info.get_info`
-
-    For each name in names, call get_info(name) and add the output
-    to a dictionary containing the arguments.
-
-    Expect a dictionary with keys
-
-    define_macros, include_dirs, library_dirs, libraries, extra_link_args, extra_compile_args
-    """
-
-    info = defaultdict(set)
-
-    # add blas/lapack info
-    for name in names: #'blas_opt', 'lapack_opt': #'blas', 'lapack'
-        d = get_info(name, 0)
-        for key in d:
-            if key in ['libraries', 'library_dirs', 'define_macros', 'include_dirs', 'extra_link_args', 'extra_compile_args']:
-                info[key].update(d[key])
-
-    info = {k: list(info[k]) for k in info}
-    tmp = defaultdict(list)
-    tmp.update(info)
-    return tmp
-
 def get_blas_lapack_info():
     """ Try three methods for getting blas/lapack info.
 
@@ -48,21 +23,21 @@ def get_blas_lapack_info():
     info = defaultdict(list)
     
     if not info:
-        print("Trying using blas_opt / lapack_opt")
-        info = from_system_info(['lapack_opt'])
+        print("Trying lapack_opt")
+        info = get_info('lapack_opt')
 
-    if (not info) or ('NO_ATLAS_INFO' in [x[0] for x in info['define_macros']]):
-        print("blas_opt / lapack_opt failed. trying blas / lapack")
-        info = from_system_info(['lapack'])
+    if not info:
+        print("lapack_opt failed. Trying lapack")
+        info = get_info(['lapack'])
 
     if info:
         info['define_macros'] += [('LAPACK_LIB_FOUND', None)]
         print('the resulting info is: ', info)
     else:
-        print("###############################################################################################")
-        print("# failed to find blas/lapack libs, SCS cannot solve SDPs but can solve LPs, SOCPs, ECPs, PCPs #")
-        print("# install blas/lapack and run this install script again to allow SCS to solve SDPs            #")
-        print("###############################################################################################")
+        print("##########################################################################################")
+        print("# failed to find lapack libs, SCS cannot solve SDPs but can solve LPs, SOCPs, ECPs, PCPs #")
+        print("# install lapack and run this install script again to allow SCS to solve SDPs            #")
+        print("##########################################################################################")
 
     return info
 
@@ -73,5 +48,7 @@ def add_blas_lapack_info(ext):
     """
     tmp = get_blas_lapack_info()
     for key in tmp:
-        ext[key] += tmp[key]
+        # don't copy over 'language' key (or other unexpedted keys), since its a string and not a list
+        if key in ['libraries', 'library_dirs', 'define_macros', 'include_dirs', 'extra_link_args', 'extra_compile_args']:
+            ext[key] += tmp[key]
 
