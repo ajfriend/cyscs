@@ -19,10 +19,13 @@ Advanced users can consult the interface notes below or the [tutorial IPython no
 - XXX: not yet uploaded to PyPI, so `pip` won't work
 - `pip install scs`
 
-### Building from source
-Users can also install by cloning this GitHub repo and running
-`python setup.py install --cython`. This method requires that the user
-has Cython installed (`pip install cython`).
+### Building from source with Cython
+Users can also install by
+- cloning this GitHub repo with `git clone --recursive https://github.com/ajfriend/scs_python.git`
+- installing dependencies `pip install numpy scipy cython`
+- (optionally, for tests) `pip install pytest`
+- running `python setup.py install --cython` inside the `scs_python` directory
+- (optionally) run tests with `make test`
 
 ## Usage
 The basic usage is almost identical to the existing SCS Python interface: 
