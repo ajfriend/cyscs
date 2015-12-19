@@ -213,4 +213,6 @@ Out[7]:
 - factor out Cone extension type
 - what about running SCS off the same factorization but different c, b
 data in multiple threads. is Workspace the best abstraction for sharing?
-- 
+
+## Sat Dec 19 07:36:49 2015
+http://stackabuse.com/python-async-await-tutorial/
