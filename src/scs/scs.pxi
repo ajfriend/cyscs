@@ -6,7 +6,8 @@ from cpython.object cimport Py_EQ, Py_NE
 
 
 def version():
-    cdef const char* c_string = scs_version()
+    cdef const char* c_string
+    c_string = scs_version()
     return c_string
 
 
@@ -31,7 +32,9 @@ def solve(dict data, Cone cone, dict sol, dict settings):
 
     cdef Info _info
 
-    cdef scs_int result = scs(&_data, &cone._cone, &_sol, &_info)
+    # todo: I bet the problem is the python printing
+    with nogil:
+        scs(&_data, &cone._cone, &_sol, &_info)
 
     sol['info'] = _info
 

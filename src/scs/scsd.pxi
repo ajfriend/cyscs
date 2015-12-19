@@ -15,7 +15,7 @@ cdef extern from "linSys.h":
 
 
 cdef extern from "scs.h":
-    scs_int scs(const Data* d, const _Cone* k, Sol* sol, Info* info)
+    scs_int scs(const Data* d, const _Cone* k, Sol* sol, Info* info) nogil
     const char * scs_version()
     
     Work * scs_init(const Data* d, const _Cone* k, Info* info)

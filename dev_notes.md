@@ -200,3 +200,17 @@ Out[7]:
 - 1e-3 + 1e-4 = 1e-4 (in solve times, with warm starting!)
 - make cython object more clearly take in dependencies
 - work.fixed to show fixed settings
+
+# Wed Dec  2 14:39:54 2015
+## GIL and multithreading
+- processor affinity seems important to getting good performance <https://www.rfk.id.au/blog/entry/a-gil-adventure-threading2/>
+- make sure Blas isn't multithreaded, but it actually shouldnt' affect SCS that much
+- [computational pipeline with coroutines?](http://www.pythonsandbarracudas.com/blog/2015/11/22/developing-a-computational-pipeline-using-the-asyncio-module-in-python-3)
+
+## TODO
+- release the GIL
+- Do some tests to see if SCS gets up to 100% usage (single thread) or 400% usage (indicating multiple threads)
+- factor out Cone extension type
+- what about running SCS off the same factorization but different c, b
+data in multiple threads. is Workspace the best abstraction for sharing?
+- 
