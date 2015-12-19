@@ -1,6 +1,5 @@
 from __future__ import print_function
 from numpy.distutils.system_info import get_info
-from collections import defaultdict
 from glob import glob
 import os
 
@@ -20,18 +19,18 @@ def get_blas_lapack_info():
 
     If not successful, print error message and return empty dictionary
     """
-    info = defaultdict(list)
+    info = {}
     
     if not info:
-        print("Trying lapack_opt")
+        print("Trying 'lapack_opt'")
         info = get_info('lapack_opt')
 
     if not info:
-        print("lapack_opt failed. Trying lapack")
-        info = get_info(['lapack'])
+        print("lapack_opt failed. Trying 'lapack'")
+        info = get_info('lapack')
 
     if info:
-        info['define_macros'] += [('LAPACK_LIB_FOUND', None)]
+        info['define_macros'] = info.get('define_macros', []) + [('LAPACK_LIB_FOUND', None)]
         print('the resulting info is: ', info)
     else:
         print("##########################################################################################")
