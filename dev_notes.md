@@ -216,3 +216,7 @@ data in multiple threads. is Workspace the best abstraction for sharing?
 
 ## Sat Dec 19 07:36:49 2015
 http://stackabuse.com/python-async-await-tutorial/
+
+## Sun Dec 20 05:23:23 2015
+nice publish branch in setup.py
+- https://github.com/dbader/schedule/blob/master/setup.py
