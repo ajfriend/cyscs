@@ -2,48 +2,46 @@ import scs
 from concurrent.futures import ThreadPoolExecutor
 import time
 
-workers = 2
-blocks = 4
-m = 1000
-repeat = 1
+"""
+Set up a list of several SCS problems and map `scs.solve` over that list.
+
+Compare the compute time of Python's serial `map` with a multithreaded map
+from concurrent.futures. Also test times with and without verbose printing.
+"""
+
+workers = 2 # size of the threadpool
+num_problems = 4
+m = 1000 # size of L1 problem
+repeat = 2 # number of times to repeat timing
 
 ex = ThreadPoolExecutor(max_workers=workers)
-datas = [scs.examples.l1(m, seed=i) for i in range(blocks)]
+data = [scs.examples.l1(m, seed=i) for i in range(num_problems)]
 
+def time_scs(mapper, **kwargs):
+    """ Map `scs.solve` over the global `data` and return timing results
 
-ts = []
-for _ in range(repeat):
-    start = time.time()
-    a = list(map(lambda x: scs.solve(*x), datas))
-    end = time.time()
-    ts.append(end-start)
-serial = min(ts)
+    Maps with `mapper`, which may be a parallel map, such as
+    `concurrent.futures.ThreadPoolExecutor.map`
 
-ts = []
-for _ in range(repeat):
-    start = time.time()
-    a = list(map(lambda x: scs.solve(*x, verbose=False), datas))
-    end = time.time()
-    ts.append(end-start)
-serialnotverbose = min(ts)
+    Pass `kwargs` onto `scs.solve` to, for example, toggle verbose output
+    """
+    ts = []
+    for _ in range(repeat):
+        start = time.time()
+        # `mapper` will usually return a generator instantly
+        # need to consume the entire generator to find the actual compute time
+        # calling `list` consumes the generator. an empty `for` loop would also work
+        a = list(mapper(lambda x: scs.solve(*x, **kwargs), data))
+        end = time.time()
+        ts.append(end-start)
+    return min(ts)
 
-ts = []
-for _ in range(repeat):
-    start = time.time()
-    a = list(ex.map(lambda x: scs.solve(*x), datas))
-    end = time.time()
-    ts.append(end-start)
-parallel = min(ts)
-
-ts = []
-for _ in range(repeat):
-    start = time.time()
-    a = list(ex.map(lambda x: scs.solve(*x, verbose=False), datas))
-    end = time.time()
-    ts.append(end-start)
-parnotverbose = min(ts)
+serial = time_scs(map)
+serialnotverbose = time_scs(map, verbose=False)
+parallel = time_scs(ex.map)
+parnotverbose = time_scs(ex.map, verbose=False)
 
 print('Serial solve time: %f'%serial)
-print('Serial (notverbose) solve time: %f'%serialnotverbose)
+print('Serial (not verbose) solve time: %f'%serialnotverbose)
 print('Parallel solve time: %f'%parallel)
 print('Parallel (not verbose) solve time: %f'%parnotverbose)

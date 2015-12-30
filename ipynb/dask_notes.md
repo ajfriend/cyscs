@@ -35,7 +35,6 @@ what does this look like on kona64...?
 https://groups.google.com/forum/#!topic/cython-users/Sm8Vcg8CPsg
 
 - test performance of using verbose or not...
-- send brendan pull request
 
 
 Serial solve time: 8.634671

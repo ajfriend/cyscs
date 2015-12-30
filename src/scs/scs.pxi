@@ -32,7 +32,6 @@ def solve(dict data, Cone cone, dict sol, dict settings):
 
     cdef Info _info
 
-    # todo: I bet the problem is the python printing
     with nogil:
         scs(&_data, &cone._cone, &_sol, &_info)
 
