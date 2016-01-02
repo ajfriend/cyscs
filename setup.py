@@ -67,7 +67,7 @@ if USE_CYTHON:
 
 
 setup(name='scs',
-        version='1.1.8',
+        version='1.1.9',
         author = 'Brendan O\'Donoghue',
         author_email = 'bodonoghue85@gmail.com',
         url = 'http://github.com/cvxgrp/scs',
