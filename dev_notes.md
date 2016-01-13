@@ -200,3 +200,30 @@ Out[7]:
 - 1e-3 + 1e-4 = 1e-4 (in solve times, with warm starting!)
 - make cython object more clearly take in dependencies
 - work.fixed to show fixed settings
+
+# Tue Jan 12 18:52:59 2016
+## design notes
+- 3 levels (of, for instance, the Workspace object)
+  - the C level
+  - the Cython level
+  - the Pure python level
+- we make extension objects and functions to wrap the C level
+- we need several of these; one for each int/float type pair
+- the python level wraps this detail to make it invisible to the user
+
+
+## todo:
+- make sure nogil on all aspects of code
+- make nogil threading example
+- rename 3 levels so that the levels are clear in code
+- make internal interface nice (in case I want a version that doesn't copy over data)
+- hide A and settings that can't be modified
+- get default settings from a C function (need to add to C interface) so that C and python are always in sync
+- remove numpy dependency
+
+# Wed Jan 13 14:25:56 2016
+## change notes
+- scs.solve(): remove `warm_start` parameter in `settings`
+- change `sol` to `warm_start`, which will accept a dict
+- **copy** data from `warm_start`, return a new numpy array (data owned by numpy array)
+
