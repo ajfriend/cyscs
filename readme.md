@@ -1,4 +1,4 @@
-# scs_python
+# `scs_python` Cython Interface
 [![Build Status](https://travis-ci.org/ajfriend/scs_python.svg?branch=master)](https://travis-ci.org/ajfriend/scs_python)
 
 `scs_python` is a Python interface, written in Cython, for [SCS](https://github.com/cvxgrp/scs), a numerical optimization package in C for solving convex cone problems.
@@ -27,14 +27,14 @@ Users can also install by
 - running `python setup.py install --cython` inside the `scs_python` directory
 - (optionally) run tests with `make test`
 
-## Usage
+## Basic Usage
 The basic usage is almost identical to the existing SCS Python interface: 
 ```python
 import scs
-result = scs.solve(data, cone, sol=None, **settings)
+result = scs.solve(data, cone, warm_start=None, **settings)
 ```
 
-We describe the arguments briefly below. For more detail, please see the [`SCS README`](https://github.com/cvxgrp/scs/blob/master/README.md).
+We describe the arguments to `scs.solve()` briefly below. For more detail, please see the [`SCS README`](https://github.com/cvxgrp/scs/blob/master/README.md).
 
 - `data` is a Python `dict` with keys:
     - `'A'`: `scipy.sparse.csc` matrix, i.e., a matrix in Compressed Sparse Column format with `m` rows and `n` columns
@@ -48,8 +48,8 @@ We describe the arguments briefly below. For more detail, please see the [`SCS R
     - `'ep'`: `int` of primal exponential cones
     - `'ed'`: `int` of dual exponential cones
     - `'p'`: `list` of `float`s of primal/dual power cone parameters 
-- `sol` is an **optional** `dict` of `numpy` arrays where the solution vectors (corresponding to keys `'x'`, `'y'`, and `'s'`) will be written. If `sol` is `None`, new `numpy` arrays will be created automatically. These are the starting-points used if `warm_start=True`.
-- `scs` also accepts optional keyword arguments for solver settings:
+- `warm_start` is an **optional** `dict` of `numpy` arrays (with keys `'x'`, `'y'`, and `'s'`) used to warm-start the solver; if these values are close to the final solution, warm-starting can reduce the number of SCS iterations
+- `scs.solve()` also accepts optional keyword arguments for solver settings:
     - `use_indirect`
     - `verbose`
     - `normalize`
@@ -59,11 +59,10 @@ We describe the arguments briefly below. For more detail, please see the [`SCS R
     - `cg_rate`
     - `alpha`
     - `rho_x`
-    - `warm_start`
 - settings are passed as keyword arguments:
-    - `scs(data, cone, sol, max_iters=100)`
+    - `scs(data, cone, max_iters=100)`
     - `scs(data, cone, alpha=1.4, eps=1e-5, verbose=True)`
-    - `scs(data, cone, sol=None, use_indirect=True)`
+    - `scs(data, cone, warm_start, use_indirect=True)`
 - default settings can be seen by calling `scs.default_settings()`
 - `result` is a `dict` with keys:
     - `'x'`: `numpy` array
@@ -71,33 +70,54 @@ We describe the arguments briefly below. For more detail, please see the [`SCS R
     - `'s'`: `numpy` array
     - `'info'`: `dict` containing solver status information
 
-## Warm-starting
-The solver can be warm-started, that is, started from a point close to the final solution in the hope of reducing the solve-time. You must supply `numpy` arrays for for **all** of the warm-started variables `x`, `y`, and `s`. Pass them via the `sol` parameter in the `scs.solve()` function with the setting `warm_start=True`:
+### Warm-starting
+The solver can be warm-started, that is, started from a point close to the final solution in the hope of reducing the solve-time. You must supply `numpy` arrays for for **all** of the warm-started variables `x`, `y`, and `s`. Pass them as dictionary to the `warm_start` parameter in `scs.solve()`:
 
 ```python
-sol = {'x': x, 'y': y, 's': s}
-result = scs.solve(data, cone, sol, warm_start=True)
+ws = {'x': x, 'y': y, 's': s}
+result = scs.solve(data, cone, warm_start=ws)
 ```
+
+### Data Formats
+Below are the integer and floating-point format expectations for input data.
+If the formats are not exactly correct, `scs` will attempt to convert the data for you.
+
+`scs` expects `b`, `c`, `x`, `y`, and `s` to be one-dimensional `numpy` arrays with `dtype` `'float64'`.
+
+`scs` also expects `A` to be a `scipy.sparse.csc` matrix such that the values of the matrix have `dtype` `'float64'`, and the attributes `A.indices` and `A.indptr` are `numpy` arrays with `dtype` `'int64'`:
+
+```python
+>>> A.dtype
+dtype('float64')
+>>> A.indices.dtype, A.indptr.dtype
+(dtype('int64'), dtype('int64')) 
+```
+
+Note that, by default, `scipy.sparse.csc` matrices have `indptr` and `indices` arrays with `dtype` `int32`. If the matrices are not converted ahead of time, `scs` will do the conversion internally, without modifying the original `A` matrix. However, it may be more efficient to construct an `A` with the correct `dtype`s initially, rather than convert.
+
+### Data Immutability
+`scs.solve()` will not modify the input data in `data`, `cone`, or `warm_start`. Copies of the data will be made for internal use, and new `numpy` arrays will be created to be returned in `result`.
+
 
 ## Factorization Caching with `scs.Workspace`
-When using the **direct** solver (`use_indirect=False`), a single matrix factorization is performed and used many times in the iterative procedure.
+When using the **direct** solver (`use_indirect=False`), a single matrix factorization is performed and used many times in SCS's iterative procedure.
 This factorization depends on the input matrix `A` but **not** on the vectors
-`b` or `c`. The `scs.Workspace()` object allows us to cache this factorization
-and call the iterative solve procedure many times where `b` and `c` are allowed to vary, but `A` is fixed.
+`b` or `c`. When solving many problems where `A` is fixed, but `b` and `c` change, the `scs.Workspace()` object allows us to cache the initial factorization and reuse it across many solves, without having to re-compute it. This can save time when solving many related problems.
 
 The `Workspace` is instantiated with the same `data` and `cone` dictionaries
-as `scs.solve()`, optional solution vectors, and optional settings:
+as `scs.solve()`, along with optional settings:
 ```python
-work = scs.Workspace(data, cone, sol=None, **settings)
+work = scs.Workspace(data, cone, **settings)
 ```
-(If `sol` is `None` or is omitted, `SCS` will create appropriately-sized `numpy` arrays automatically.)
 
 Once the `Workspace` object is created, we can call its solve method
 ```
-result = work.solve(data=None, sol=None, **settings)
+result = work.solve(data=None, warm_start=None, **settings)
 ```
 
-which will re-use the matrix factorization that was computed when the `Workspace` was initialized. `result` is a `dict` with keys `x`, `y`, `s`, and `info`, just as in `scs.solve()`.
+which will re-use the matrix factorization that was computed when the `Workspace` was initialized. Note that all of the parameters to `work.solve()` are optional.
+
+The return value, `result`, is a `dict` with keys `x`, `y`, `s`, and `info`, just as in `scs.solve()`.
 
 ### `Workspace` state
 `work.solve()` will operate on the data contained in the `work` object:
@@ -105,36 +125,79 @@ which will re-use the matrix factorization that was computed when the `Workspace
 - `work.data`
 - `work.cone`
 - `work.settings`
-- `work.sol` (these are used for warm-starting if `warm_start=True`)
 
-Some of these data and settings **cannot** be modified between calls to `work.solve()`. They are fixed at `Workspace` initialization time:
+The user can modify the state of the `Workspace` object between calls to `work.solve`.
 
-- the `settings`: `use_indirect`, `rho_x`, `normalize`, `scale`
-- `data['A']`
+#### `work.data`
+Note that `work.data` is a `dict` with keys `b` and `c`, but **not** `A`. This is because `A`  is copied and stored internally (along with its factorization) upon initialization, and cannot be modified.
 
-A copy of the `dict` of **fixed settings** is given by `work.fixed`. If any of the `work.settings` differ from `work.fixed` when `work.solve()` is called, an `Exception` will be raised.
+Due to the data copy, the user is now free to delete or modify the `A` matrix that they passed into the `scs.Workspace` constructor, as this will have no effect on the `Workspace` object.
 
-Some of these data and settings **can** be modified between calls to `work.solve()`:
-- `data['b']` and `data['c']`
-- `work.sol`
-- any of the `work.settings` **not** in `work.fixed`
+#### `work.settings`
+Only some of the values in `work.settings` can be modified between calls to `work.solve()`.
 
-In addition to being returned by `result = work.solve()`, the solver return status can be inspected through the `dict` `work.info`, and the solution vectors can be found in `work.sol`.
+The following settings are **fixed** at `Workspace` initialization time:
+
+- `use_indirect`
+- `rho_x`
+- `normalize`
+- `scale`
+
+A copy of the `dict` of **fixed settings** is given by `work.fixed`. If any of the `work.settings` differ from `work.fixed` when `work.solve()` is called, an `Exception` will be raised. Calling `work.fixed` returns a **copy** of the underlying `dict`, which cannot be modified. XXX: make a test for this
+
+The following settings **can** be modified between calls to `work.solve()`:
+
+- `verbose`
+- `max_iters`
+- `eps`
+- `cg_rate`
+- `alpha`
+
+#### `work.cone`
+In principle, the convex cones  in `work.cone` **can** change between solves.
+However, we haven't seen a use-case for this, so the interface currently
+prohibits modification of `work.cone`. Accessing `work.cone` returns a deep **copy** of the data so that the underlying `cone` dictionary cannot be modified.
+
+XXX: add a test
+
+
+#### `work.info`
+
+When calling `result = work.solve()`, solver status information is available
+through the `result['info']` dictionary. This same information is also available through the attribute `work.info`.
+
+This attribute is useful, for instance, if you'd like to know the solver setup time after calling `Workspace()` but before calling `work.solve()`, which you can access with `work.info['setupTime']`.
 
 ### `work.sol()` arguments
-Passing `data`, `sol`, or `settings` to `work.solve()` provides one last chance to change the problem data before calling the solver. These changes persist between calls to `work.solve()`. In fact,
-```
+
+#### `data` and `settings`
+Passing a `data` dictionary or additional settings to `work.solve()` provides one last chance to modify the problem data before calling the solver. Any changes are written to the `work` object and persist to future calls to `work.solve()`. In fact,
+```python
 work.solve(eps=1e-5, alpha=1.1)
 ```
 
 is exactly equivalent to
 
-```
+```python
 work.settings['eps'] = 1e-5
 work.settings['alpha'] = 1.1
 work.solve()
 ```
 
-If `data` is passed to `work.solve()`, only the keys `b` and `c` will be used to update `work.data`. The `A` key will be ignored.
+If `data` is passed to `work.solve()`, only the keys `b` and `c` will be used to update `work.data`. If an `A` key exists, it will be ignored.
+
+#### `warm_start`
+You can also provide a dictionary of warm-start vectors to the `warm_start` parameter, which may help reduce the solve time.
+
+In the example below, we first solve a problem to a tolerance of `1e-3`, and use that solution as a warm-start for solving the problem to a higher tolerance of `1e-4`. The second call to `work.solve()` will generally take fewer iterations than if we hadn't provided a `warm_start`.
+
+```python
+work = Workspace(data, cone)
+sol = work.solve(eps=1e-3)
+sol = work.solve(warm_start=sol, eps=1e-4)
+```
+
+## Example Library
+Show off some of the examples which demonstrate how to properly format input data.
 
 

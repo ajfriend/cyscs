@@ -226,4 +226,8 @@ Out[7]:
 - scs.solve(): remove `warm_start` parameter in `settings`
 - change `sol` to `warm_start`, which will accept a dict
 - **copy** data from `warm_start`, return a new numpy array (data owned by numpy array)
+- what about data copies and conversion of types?
+- make a note of the expected input type int and floats?
+- of course, we don't need to copy b and c
+- "advanced" interface behind the main one
 
