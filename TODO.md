@@ -5,6 +5,7 @@
     - treat input data as immutable
     - initially only support `double` and `int64` data. convert numpy arrays as necessary
     - optional `warm_start` dictionary
+- upload to PyPI, installable as `pip install scs`
 - refactor code as cleanly as possible in 3 distinct levels: C, Cython, and pure Python
 - `nogil` multithreading working with tests for all aspects of interface 
 - setup.py testing on multiple platforms (CI for mac/windows testing?)
