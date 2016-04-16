@@ -60,9 +60,9 @@ We describe the arguments to `scs.solve()` briefly below. For more detail, pleas
     - `alpha`
     - `rho_x`
 - settings are passed as keyword arguments:
-    - `scs(data, cone, max_iters=100)`
-    - `scs(data, cone, alpha=1.4, eps=1e-5, verbose=True)`
-    - `scs(data, cone, warm_start, use_indirect=True)`
+    - `scs.solve(data, cone, max_iters=100)`
+    - `scs.solve(data, cone, alpha=1.4, eps=1e-5, verbose=True)`
+    - `scs.solve(data, cone, warm_start, use_indirect=True)`
 - default settings can be seen by calling `scs.default_settings()`
 - `result` is a `dict` with keys:
     - `'x'`: `numpy` array
@@ -168,7 +168,7 @@ through the `result['info']` dictionary. This same information is also available
 
 This attribute is useful, for instance, if you'd like to know the solver setup time after calling `Workspace()` but before calling `work.solve()`, which you can access with `work.info['setupTime']`.
 
-### `work.sol()` arguments
+### `work.solve()` arguments
 
 #### `data` and `settings`
 Passing a `data` dictionary or additional settings to `work.solve()` provides one last chance to modify the problem data before calling the solver. Any changes are written to the `work` object and persist to future calls to `work.solve()`. In fact,
