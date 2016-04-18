@@ -131,7 +131,6 @@ The return value, `sol`, is a `dict` with keys `x`, `y`, `s`, and `info`, just a
 `work.solve()` will operate on the data contained in the `work` object:
 
 - `work.data`
-- `work.cone`
 - `work.settings`
 
 The user can modify the state of the `Workspace` object between calls to `work.solve`.
@@ -161,20 +160,20 @@ The following settings **can** be modified between calls to `work.solve()`:
 - `cg_rate`
 - `alpha`
 
-#### `work.cone`
-In principle, the convex cones  in `work.cone` **can** change between solves.
-However, we haven't seen a use-case for this, so the interface currently
-prohibits modification of `work.cone`. Accessing `work.cone` returns a deep **copy** of the data so that the underlying `cone` dictionary cannot be modified.
-
-XXX: add a test
-
-
 #### `work.info`
 
 When calling `sol = work.solve()`, solver status information is available
 through the `sol['info']` dictionary. This same information is also available through the attribute `work.info`.
 
 This attribute is useful, for instance, if you'd like to know the solver setup time after calling `Workspace()` but before calling `work.solve()`, which you can access with `work.info['setupTime']`.
+
+#### Immutable `work` state
+Upon initialization, `A` is copied, stored, and factored internally.
+Any changes made to the `scipy` sparse input matrix `A` after the fact
+will not be reflected in the `work` object.
+Similarly, `work.cone` is fixed at initialization and cannot be modified.
+To avoid confusion, we do not expose `A` or `cone` to the user
+through the `work` object.
 
 ### `work.solve()` arguments
 
