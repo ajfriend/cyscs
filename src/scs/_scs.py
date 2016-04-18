@@ -1,17 +1,17 @@
 from ._direct import Cone, version
 
-from ._direct import Cone as Cone_dir
-from ._direct import solve as solve_dir
-from ._direct import Workspace as work_dir
-
-from ._indirect import Cone as Cone_indir
-from ._indirect import solve as solve_indir
-from ._indirect import Workspace as work_indir
+import scs._direct
+import scs._indirect
 
 from warnings import warn
 import scipy.sparse as sp
 import numpy as np
 
+"""
+## Notes
+- cy.Cone, cy.Workspace are Cython classes, wrapping the C structs
+- cy.solve is a Cython function, wrapping the C function
+"""
 
 def default_settings():
     # todo: note that unrecognized keyword argument settings are silently ignored?
@@ -38,13 +38,11 @@ def solve(data, cone, sol=None, **settings):
     # even though Cone is identical between the two solvers, they compiled to
     # different types, so we get a type mismatch if we try to mix them
     if stg['use_indirect']:
-        Cone = Cone_indir
-        solve_ = solve_indir
+        cy = scs._indirect
     else:
-        Cone = Cone_dir
-        solve_ = solve_dir
+        cy = scs._direct
 
-    cone = Cone(**cone)
+    cone = cy.Cone(**cone)
 
     # todo: decide if we should overwrite data with modified matrices
     # woah! wipes the 'data' dictionary
@@ -55,7 +53,7 @@ def solve(data, cone, sol=None, **settings):
         m, n = data['A'].shape
         sol = dict(x=np.zeros(n), y=np.zeros(m), s=np.zeros(m))
 
-    return solve_(data, cone, sol, stg)
+    return cy.solve(data, cone, sol, stg)
 
 def not_met(*vargs):
     return not all(vargs)
@@ -136,10 +134,14 @@ class Workspace(object):
             self.sol = sol            
         # todo: fixed parameters: rho, normalize, ...
 
+        # todo: does it make sense to have an indirect workspace?
+        # should we only allow `direct` Workspaces
         if self.settings['use_indirect']:
-            self._work = work_indir(self.data, self.cone, self._settings)
+            cy = scs._indirect
         else:
-            self._work = work_dir(self.data, self.cone, self._settings)
+            cy = scs._direct
+
+        self._work = cy.Workspace(self.data, self.cone, self._settings)
 
     @property
     def fixed(self):
