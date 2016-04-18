@@ -2,89 +2,60 @@ from __future__ import print_function
 import scs
 import pytest
 
-def test_cone():
-    d = dict(f=1, l=20, ep=4, ed=7, q=[3,4,9,10], s=[3,2,4], p=[.1, -.7])
-    print(scs.Cone(**d))
-
-def test_repr():
-    d = dict(f=1, l=20, ep=4, ed=7, q=[3,4,9,10], s=[3,2,4], p=[.1, -.7])
-    c = scs.Cone(**d)
-
-    c2 = eval('scs.' + str(c))
-
-    assert c == c2
-
-def test_eq():
-    c = scs.Cone(f=1,l=3)
-    c2 = scs.Cone(f=1,l=4)
-
-    assert c != c2
-
-def test_invalid_leq():
-    c = scs.Cone(f=1,l=3)
-    c2 = scs.Cone(f=1,l=4)
-
-    with pytest.raises(SyntaxError):
-        c < c2
-
-def test_invalid_eq():
-    c = scs.Cone(f=1,l=3)
-
-    with pytest.raises(SyntaxError):
-        c >= 4
-
-def test_diff_cones():
-    c = scs.Cone(f=1,l=3)
-    c2 = scs.Cone(f=1,l=4,p=[.1,.4])
-
-    assert c != c2
-
-def test_diff_cones():
-    c = scs.Cone(f=1,l=3, p=[.10001, .4])
-    c2 = scs.Cone(f=1,l=4,p=[.1,.4])
-
-    assert c != c2
+from scs._scs import cone_len, make_cone
 
 def test_size_f():
     n = 13
-    c = scs.Cone(f=n)
+    d = dict(f=n)
 
-    assert len(c) == n
+    assert cone_len(d) == n
 
 def test_size_l():
     n = 13
-    c = scs.Cone(l=n)
+    c = dict(l=n)
 
-    assert len(c) == n
+    assert cone_len(c) == n
 
 def test_size_ep():
     n = 13
-    c = scs.Cone(ep=n)
+    c = dict(ep=n)
 
-    assert len(c) == 3*n
+    assert cone_len(c) == 3*n
 
 def test_size_ed():
     n = 13
-    c = scs.Cone(ed=n)
+    c = dict(ed=n)
 
-    assert len(c) == 3*n
+    assert cone_len(c) == 3*n
 
 def test_size_q():
     n = 13
     m = 3
-    c = scs.Cone(q=[n,m])
+    c = dict(q=[n,m])
+    c = make_cone(c)
 
-    assert len(c) == n+m
+    assert cone_len(c) == n+m
 
 def test_size_s():
     n = 13
     m = 3
-    c = scs.Cone(s=[n,m])
+    c = dict(s=[n,m])
+    c = make_cone(c)
 
-    assert len(c) == (n*(n+1))/2 + (m*(m+1))/2
+    assert cone_len(c) == (n*(n+1))/2 + (m*(m+1))/2
 
 def test_size_p():
     a = [-.4, .7]
-    c = scs.Cone(p=a)
+    c = dict(p=a)
+    c = make_cone(c)
 
-    assert len(c) == 3*len(a)
+    assert cone_len(c) == 3*len(a)
+
+def test_cone():
+    d = dict(f=1, l=20, ep=4, ed=7, q=[3,4,9,10], s=[3,2,4], p=[.1, -.7])
+    c = make_cone(d)
+
+    expected = (d['f'] + d['l'] + 3*d['ep'] + 3*d['ed'] +
+                sum(d['q']) + len(d['p'])*3 + sum([i*(i+1)/2 for i in d['s']]))
+
+    assert cone_len(c) == expected

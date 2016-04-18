@@ -1,4 +1,4 @@
-from ._direct import Cone, version
+from ._direct import version
 
 import scs._direct
 import scs._indirect
@@ -12,6 +12,56 @@ import numpy as np
 - cy.Cone, cy.Workspace are Cython classes, wrapping the C structs
 - cy.solve is a Cython function, wrapping the C function
 """
+
+def make_cone(cone_in):
+    # only move over the keys we expect
+    # don't move over keys not present
+    # no empty arrays, just don't move over
+
+    cone_out = {}
+
+    for key in 'f', 'l', 'ep', 'ed':
+        if key in cone_in:
+            cone_out[key] = cone_in[key]
+
+    for key in 'q', 's':
+        if key in cone_in and len(cone_in[key]) > 0:
+            cone_out[key] = np.array(cone_in[key], dtype=np.int64)
+
+    if 'p' in cone_in and len(cone_in['p']) > 0:
+        cone_out['p'] = np.array(cone_in['p'], dtype=np.float64)
+
+    return cone_out
+
+# not in public interface..
+def cone_len(cone):
+    total = 0
+
+    if 'f' in cone:
+        total += cone['f']
+
+    if 'l' in cone:
+        total += cone['l']
+
+    if 'ep' in cone:
+        total += 3*cone['ep']
+
+    if 'ed' in cone:
+        total += 3*cone['ed']
+
+    if 'q' in cone:
+        total += sum(cone['q'])
+
+    if 's' in cone:
+        s = cone['s']
+        # numpy array operations
+        total += sum(s*(s+1)/2)
+
+    if 'p' in cone:
+        total += 3*len(cone['p'])
+
+    return total
+
 
 def default_settings():
     # todo: note that unrecognized keyword argument settings are silently ignored?
@@ -42,10 +92,11 @@ def solve(data, cone, sol=None, **settings):
     else:
         cy = scs._direct
 
-    cone = cy.Cone(**cone)
+    cone = make_cone(cone)
 
     # todo: decide if we should overwrite data with modified matrices
     # woah! wipes the 'data' dictionary
+    #TODO: put back in!
     data = check_data(data, cone)
 
     # todo: sol prep should be done at python level?
@@ -58,6 +109,7 @@ def solve(data, cone, sol=None, **settings):
 def not_met(*vargs):
     return not all(vargs)
 
+# todo: does this change the data?
 def check_data(data, cone):
     # data has elements A, b, c
     if not_met('A' in data, 'b' in data, 'c' in data):
@@ -104,7 +156,8 @@ def check_data(data, cone):
         warn("Converting A.data to array with dtype = numpy.float64")
         A.data = A.data.astype(np.float64)
 
-    if not_met(len(cone) > 0, A.shape[0] == len(cone)):
+    # todo: whats up with this len calcuation?
+    if not_met(cone_len(cone) > 0, A.shape[0] == cone_len(cone)):
         raise ValueError('The cones must match the number of rows of A.')
 
     # return modified data if we needed to convert anything
@@ -124,8 +177,10 @@ class Workspace(object):
         self._settings.update(settings)
         self._fixed = {k: self._settings[k] for k in self._fixed_keys}
 
-        self.cone = cone
-        self.data = check_data(data, Cone(**cone))
+        # todo: make cone and copy here. internal. can't change
+        self.cone = make_cone(cone)
+        # todo: why is check data returning something?
+        self.data = check_data(data, self.cone)
         
         m, n = data['A'].shape
         if sol is None:

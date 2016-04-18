@@ -231,3 +231,25 @@ Out[7]:
 - of course, we don't need to copy b and c
 - "advanced" interface behind the main one
 
+# Sun Apr 17 21:38:40 2016
+- how much of the Cython Workspace object is exposed to the user?
+- when do we convert dicts?
+- make cone immutable (a copy) and don't list the attribute. we don't list A...
+- turn check data back on!
+- who owns the cone data? cython or Python level?
+- bad that i need to remember to `make_cone` each time
+- pay attention to what is public and what is private functions/classes
+- whats the easiest way to test each level of the interface (C/Cython/Python) separately, with minimal coupling?
+- make it explicit that the public interface is listed in the `__init__.py`?
+
+# Mon Apr 18 13:23:13 2016
+- annoying: `make test` runs the installed tests (maybe annoying for dev, but good for deploy?)
+- do i need this in `_scs.py`?:
+  ```
+  import scs._direct
+  import scs._indirect
+  ```
+  
+  or can i do the relative import?
+- bam
+
