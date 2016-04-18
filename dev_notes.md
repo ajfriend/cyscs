@@ -251,5 +251,9 @@ Out[7]:
   ```
   
   or can i do the relative import?
-- bam
 
+- move defs to separate file, and import in the scs.pxi
+  - will reduce the extra .pdx files
+  - more explit import of C functions and structs
+  - won't need to quote alias Cone
+- python layer makes copy of cone arrays for Cython layer to use to pass off to C layer

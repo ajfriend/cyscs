@@ -13,6 +13,8 @@ import numpy as np
 - cy.solve is a Cython function, wrapping the C function
 """
 
+# todo: rename to format cone
+# this does make a **copy**...
 def make_cone(cone_in):
     # only move over the keys we expect
     # don't move over keys not present
@@ -96,7 +98,6 @@ def solve(data, cone, sol=None, **settings):
 
     # todo: decide if we should overwrite data with modified matrices
     # woah! wipes the 'data' dictionary
-    #TODO: put back in!
     data = check_data(data, cone)
 
     # todo: sol prep should be done at python level?
@@ -167,6 +168,11 @@ def check_data(data, cone):
     return data
 
 class Workspace(object):
+    """
+    responsibility: keep an internal *copy* of cone. underlying Cython layer
+    will use numpy memory in C calls.
+    """
+
     _fixed_keys = 'use_indirect', 'rho_x', 'normalize', 'scale'
 
     def __init__(self, data, cone, sol=None, **settings):
@@ -178,9 +184,10 @@ class Workspace(object):
         self._fixed = {k: self._settings[k] for k in self._fixed_keys}
 
         # todo: make cone and copy here. internal. can't change
-        self.cone = make_cone(cone)
+        self._cone = make_cone(cone)
+
         # todo: why is check data returning something?
-        self.data = check_data(data, self.cone)
+        self.data = check_data(data, self._cone)
         
         m, n = data['A'].shape
         if sol is None:
@@ -196,7 +203,7 @@ class Workspace(object):
         else:
             cy = scs._direct
 
-        self._work = cy.Workspace(self.data, self.cone, self._settings)
+        self._work = cy.Workspace(self.data, self._cone, self._settings)
 
     @property
     def fixed(self):
@@ -231,7 +238,7 @@ class Workspace(object):
         if sol:
             self.sol = sol
 
-        self._work.solve(self.data['b'], self.data['c'], self.sol, self.settings)
+        self._work.solve(self.data['b'], self.data['c'], self._cone, self.sol, self.settings)
 
         result = dict(self.sol)
         result['info'] = self.info

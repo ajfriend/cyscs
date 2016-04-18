@@ -1,5 +1,3 @@
-# use the python malloc/free to have the memory attributed to python.
-#from cpython.mem cimport PyMem_Malloc, PyMem_Free
 
 
 def version():
@@ -12,10 +10,10 @@ def solve(dict data, dict cone, dict sol, dict settings):
 
     cone - assume cone has numpy arrays where appropriate
     """
-    A = data['A']
-    cdef scs_int m, n 
-    m, n = A.shape
+    cdef scs_int m, n
 
+    A = data['A']    
+    m, n = A.shape
     cdef AMatrix _A = make_amatrix(A.data, A.indices, A.indptr, m, n)
 
     cdef scs_float[:] b = data['b']
@@ -40,6 +38,7 @@ def solve(dict data, dict cone, dict sol, dict settings):
 # todo: lightweight wrapper object for cones is the way to go.
 # don't want to put all the cone functionality in here, since we
 # need to compile the class for each int/float combo
+# rename to cone stuffer?
 cdef class Cone:
     """
     - expects input to by numpy arrays where approrpiate
@@ -100,10 +99,6 @@ cdef class Workspace:
         AMatrix _A
 
         Data _data
-        # could probably move Cone up to python
-        # do we want a cone struct here, or just a dict?
-        # copy the cone data?
-        Cone _cone
 
 
     def __cinit__(self, dict data, dict cone, dict settings):
@@ -119,11 +114,10 @@ cdef class Workspace:
 
         self._data = Data(m, n, &self._A, &b[0], &c[0], &self.settings)
 
-        # todo: do i convert at this point?
-        self._cone = Cone(**cone)
+        # make cython cone (really need to disambiguate)
+        _cone = Cone(**cone)
 
-        # does scs_init use the cone for anything? we could test by putting in NULL
-        self._work = scs_init(&self._data, &self._cone._cone, &self.info)
+        self._work = scs_init(&self._data, &_cone._cone, &self.info)
 
         if self._work == NULL:
             raise MemoryError("Memory error in allocating Workspace.")
@@ -133,7 +127,7 @@ cdef class Workspace:
             scs_finish(self._work);
 
     # this is weird and inconsistent. why no cone?
-    def solve(self, scs_float[:] b, scs_float[:] c, dict sol, dict settings):
+    def solve(self, scs_float[:] b, scs_float[:] c, dict cone, dict sol, dict settings):
         self.settings = settings
         self._data.stgs = &self.settings
         self._data.b = &b[0]
@@ -141,5 +135,7 @@ cdef class Workspace:
         
         cdef Sol _sol = make_sol(sol['x'], sol['y'], sol['s'])
 
-        cdef scs_int status
-        status = scs_solve(self._work, &self._data, &self._cone._cone, &_sol, &self.info)
+        _cone = Cone(**cone)
+
+        # write to sol and info
+        scs_solve(self._work, &self._data, &_cone._cone, &_sol, &self.info)
