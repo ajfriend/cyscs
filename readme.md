@@ -119,10 +119,11 @@ work = scs.Workspace(data, cone, **settings)
 
 Once the `Workspace` object is created, we can call its solve method
 ```python
-sol = work.solve(data=None, warm_start=None, **settings)
+sol = work.solve(new_bc=None, warm_start=None, **settings)
 ```
 
-which will re-use the matrix factorization that was computed when the `Workspace` was initialized. Note that all of the parameters to `work.solve()` are optional.
+which will re-use the matrix factorization that was computed when the `Workspace` was initialized. Note that all of the parameters to `work.solve()` are optional. `new_bc` is a dictionary which can optionally provide
+updated `b` or `c` vectors (any other keys, including `A`, are ignored).
 
 The return value, `sol`, is a `dict` with keys `x`, `y`, `s`, and `info`, just as in `scs.solve()`.
 
@@ -177,42 +178,56 @@ This attribute is useful, for instance, if you'd like to know the solver setup t
 
 ### `work.solve()` arguments
 
-#### `data` and `settings`
-Passing a `data` dictionary or additional settings to `work.solve()` provides one last chance to modify the problem data before calling the solver. Any changes are written to the `work` object and persist to future calls to `work.solve()`. In fact,
+#### `new_bc` and `settings`
+Passing a `new_bc` dictionary or additional settings to `work.solve()` provides one last chance to modify the problem data before calling the solver. Any changes are written to the `work` object and persist to future calls to `work.solve()`. In fact,
 ```python
-work.solve(eps=1e-5, alpha=1.1)
+new_b = dict(b=b)
+work.solve(new_bc = new_b, eps=1e-5, alpha=1.1)
 ```
 
 is exactly equivalent to
 
 ```python
+work.data['b'] = b
 work.settings['eps'] = 1e-5
 work.settings['alpha'] = 1.1
 work.solve()
 ```
 
-If `data` is passed to `work.solve()`, only the keys `b` and `c` will be used to update `work.data`. If an `A` key exists, it will be ignored.
+If `new_bc` is passed to `work.solve()`, only the keys `b` and `c` will be used to update `work.data`. If an `A` key exists, it will be ignored.
+
+More commonly, a user might simply update the original `data` dictionary and pass it to `work.solve()`:
+
+```python
+work = scs.Workspace(data, cone)
+...
+data['b'] = b # update the b vector
+sol = work.solve(new_bc=data)
+```
 
 #### `warm_start`
 You can also provide a dictionary of warm-start vectors to the `warm_start` parameter, which may help reduce the solve time.
 
-In the example below, we first solve a problem to a tolerance of `1e-3`, and use that solution as a warm-start for solving the problem to a higher tolerance of `1e-4`. The second call to `work.solve()` will generally take fewer iterations than if we hadn't provided a `warm_start`.
+In the example below, we first solve a problem to a tolerance of `1e-3`, and use that solution as a warm-start for solving the problem to a higher tolerance of `1e-4`. The second call to `work.solve()` will generally take fewer iterations than if we hadn't provided a `warm_start`, and also
+benefits from not having to re-compute the matrix factorization.
 
 ```python
-work = Workspace(data, cone)
+work = scs.Workspace(data, cone)
 sol = work.solve(eps=1e-3)
 sol = work.solve(warm_start=sol, eps=1e-4)
 ```
 
 ## Example Library
-Show off some of the examples which demonstrate how to properly format input data.
+`SCS` comes with a small examples library,
+`scs.examples`, which
+demonstrates the proper problem input format,
+and can be used to easily test the solver.
 
-## Interface
-
+For example,
 ```python
-work = scs.Workspace(data, cone, **settings)
-sol = work.solve(new_bc=None, warm_start=None, **settings)
-work.data # is a dict with b, c
+import scs
+data, cone = scs.examples.l1(m=100, seed=0)
+sol = scs.solve(data, cone)
 ```
 
-
+solves a simple least L1-norm problem.
