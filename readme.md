@@ -31,7 +31,7 @@ Users can also install by
 The basic usage is almost identical to the existing SCS Python interface: 
 ```python
 import scs
-result = scs.solve(data, cone, warm_start=None, **settings)
+sol = scs.solve(data, cone, warm_start=None, **settings)
 ```
 
 We describe the arguments to `scs.solve()` briefly below. For more detail, please see the [`SCS README`](https://github.com/cvxgrp/scs/blob/master/README.md).
@@ -64,7 +64,7 @@ We describe the arguments to `scs.solve()` briefly below. For more detail, pleas
     - `scs.solve(data, cone, alpha=1.4, eps=1e-5, verbose=True)`
     - `scs.solve(data, cone, warm_start, use_indirect=True)`
 - default settings can be seen by calling `scs.default_settings()`
-- `result` is a `dict` with keys:
+- `sol` is a `dict` with keys:
     - `'x'`: `numpy` array
     - `'y'`: `numpy` array
     - `'s'`: `numpy` array
@@ -75,8 +75,15 @@ The solver can be warm-started, that is, started from a point close to the final
 
 ```python
 ws = {'x': x, 'y': y, 's': s}
-result = scs.solve(data, cone, warm_start=ws)
+sol = scs.solve(data, cone, warm_start=ws)
 ```
+
+Output from previous solves can be used to warm-start future solves:
+```python
+sol = scs.solve(data, cone, eps=1e-3)
+sol = scs.solve(data, cone, warm_start=sol, eps=1e-4)
+```
+
 
 ### Data Formats
 Below are the integer and floating-point format expectations for input data.
@@ -96,7 +103,7 @@ dtype('float64')
 Note that, by default, `scipy.sparse.csc` matrices have `indptr` and `indices` arrays with `dtype` `int32`. If the matrices are not converted ahead of time, `scs` will do the conversion internally, without modifying the original `A` matrix. However, it may be more efficient to construct an `A` with the correct `dtype`s initially, rather than convert.
 
 ### Data Immutability
-`scs.solve()` will not modify the input data in `data`, `cone`, or `warm_start`. Copies of the data will be made for internal use, and new `numpy` arrays will be created to be returned in `result`.
+`scs.solve()` will not modify the input data in `data`, `cone`, or `warm_start`. Copies of the data will be made for internal use, and new `numpy` arrays will be created to be returned in `sol`.
 
 
 ## Factorization Caching with `scs.Workspace`
@@ -111,13 +118,13 @@ work = scs.Workspace(data, cone, **settings)
 ```
 
 Once the `Workspace` object is created, we can call its solve method
-```
-result = work.solve(data=None, warm_start=None, **settings)
+```python
+sol = work.solve(data=None, warm_start=None, **settings)
 ```
 
 which will re-use the matrix factorization that was computed when the `Workspace` was initialized. Note that all of the parameters to `work.solve()` are optional.
 
-The return value, `result`, is a `dict` with keys `x`, `y`, `s`, and `info`, just as in `scs.solve()`.
+The return value, `sol`, is a `dict` with keys `x`, `y`, `s`, and `info`, just as in `scs.solve()`.
 
 ### `Workspace` state
 `work.solve()` will operate on the data contained in the `work` object:
@@ -163,8 +170,8 @@ XXX: add a test
 
 #### `work.info`
 
-When calling `result = work.solve()`, solver status information is available
-through the `result['info']` dictionary. This same information is also available through the attribute `work.info`.
+When calling `sol = work.solve()`, solver status information is available
+through the `sol['info']` dictionary. This same information is also available through the attribute `work.info`.
 
 This attribute is useful, for instance, if you'd like to know the solver setup time after calling `Workspace()` but before calling `work.solve()`, which you can access with `work.info['setupTime']`.
 
@@ -199,5 +206,13 @@ sol = work.solve(warm_start=sol, eps=1e-4)
 
 ## Example Library
 Show off some of the examples which demonstrate how to properly format input data.
+
+## Interface
+
+```python
+work = scs.Workspace(data, cone, **settings)
+sol = work.solve(new_bc=None, warm_start=None, **settings)
+work.data # is a dict with b, c
+```
 
 
