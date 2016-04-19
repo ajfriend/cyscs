@@ -10,18 +10,9 @@ def solve(dict data, dict cone, dict sol, dict settings):
 
     cone - assume cone has numpy arrays where appropriate
     """
-    cdef scs_int m, n
-
-    A = data['A']    
-    m, n = A.shape
-    c_A = stuff_c_amatrix(A.data, A.indices, A.indptr, m, n)
-
-    cdef scs_float[:] b = data['b']
-    cdef scs_float[:] c = data['c']
-
-    cdef Settings _settings = settings
-
-    cdef Data _data = Data(m, n, &c_A, &b[0], &c[0], &_settings)
+    c_A = stuff_c_amatrix(data['A'])
+    cdef Settings c_settings = settings
+    c_data = stuff_c_data(c_A, data['b'], data['c'], c_settings)
 
     c_sol = stuff_c_sol(sol)
 
@@ -30,11 +21,25 @@ def solve(dict data, dict cone, dict sol, dict settings):
     c_cone = stuff_c_cone(cone)
 
     # write to sol and info
-    scs(&_data, &c_cone, &c_sol, &_info)
+    scs(&c_data, &c_cone, &c_sol, &_info)
 
     sol['info'] = _info
 
     return sol
+
+# very confusing. pass/return by reference?
+cdef c_Data stuff_c_data(c_AMatrix c_A,
+                         scs_float[:] b,
+                         scs_float[:] c,
+                         Settings c_settings):
+    cdef:
+        scs_int m, n
+        c_Data c_data
+
+    m, n = c_A.m, c_A.n
+    #c_data = c_Data(m, n, &c_A, &b[0], &c[0], &c_settings)
+
+    return c_Data(m, n, &c_A, &b[0], &c[0], &c_settings)
 
 
 # 3 function stuff structures, memory belongs elsewhere
@@ -83,11 +88,25 @@ cdef c_Sol stuff_c_sol(dict sol):
 
     return c_sol
 
-cdef c_AMatrix stuff_c_amatrix(scs_float[:] data, scs_int[:] ind, scs_int[:] indptr, scs_int m, scs_int n):
+#cdef c_AMatrix stuff_c_amatrix(scs_float[:] data, scs_int[:] ind, scs_int[:] indptr, scs_int m, scs_int n):
+cdef c_AMatrix stuff_c_amatrix(A):
+    cdef:
+        scs_int m, n
+        scs_float[:] data
+        scs_int[:] ind
+        scs_int[:] indptr
+        c_AMatrix c_A
+
+    m, n = A.shape
+    data = A.data
+    ind = A.indices
+    indptr = A.indptr
     # Amatrix is not really big, so there's no need to dynamically allocate it.
     # difference with C/python? don't need to make this dynamically declared?
     # maybe fill a local array and then memcopy to dynamically allocated array
-    cdef c_AMatrix c_A = c_AMatrix(&data[0], &ind[0], &indptr[0], m, n)
+
+    c_A = c_AMatrix(&data[0], &ind[0], &indptr[0], m, n)
+
     return c_A
 
 
@@ -97,30 +116,21 @@ cdef c_AMatrix stuff_c_amatrix(scs_float[:] data, scs_int[:] ind, scs_int[:] ind
 cdef class Workspace:
     cdef: #private by default, 'readonly' to make public
         Work * _work
-        Settings settings
+        Settings c_settings
+        c_AMatrix c_A
+        c_Data c_data
 
         readonly Info info
-        c_AMatrix c_A
-
-        Data _data
-
 
     def __cinit__(self, dict data, dict cone, dict settings):
-        cdef scs_int m, n
-        self.settings = settings
+        self.c_settings = settings
+        self.c_A = stuff_c_amatrix(data['A'])
 
-        A = data['A']
-        m,n = A.shape
-        self.c_A = stuff_c_amatrix(A.data, A.indices, A.indptr, m, n)
-
-        cdef scs_float[:] b = data['b']
-        cdef scs_float[:] c = data['c']
-
-        self._data = Data(m, n, &self.c_A, &b[0], &c[0], &self.settings)
+        self.c_data = stuff_c_data(self.c_A, data['b'], data['c'], self.c_settings)
 
         c_cone = stuff_c_cone(cone)
 
-        self._work = scs_init(&self._data, &c_cone, &self.info)
+        self._work = scs_init(&self.c_data, &c_cone, &self.info)
 
         if self._work == NULL:
             raise MemoryError("Memory error in allocating Workspace.")
@@ -131,13 +141,13 @@ cdef class Workspace:
 
 
     def solve(self, scs_float[:] b, scs_float[:] c, dict cone, dict sol, dict settings):
-        self.settings = settings
-        self._data.stgs = &self.settings
-        self._data.b = &b[0]
-        self._data.c = &c[0]
+        self.c_settings = settings
+        self.c_data.stgs = &self.c_settings
+        self.c_data.b = &b[0]
+        self.c_data.c = &c[0]
         
         c_sol = stuff_c_sol(sol)
         c_cone = stuff_c_cone(cone)
 
         # write to sol and info
-        scs_solve(self._work, &self._data, &c_cone, &c_sol, &self.info)
+        scs_solve(self._work, &self.c_data, &c_cone, &c_sol, &self.info)
