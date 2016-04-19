@@ -4,22 +4,22 @@ cdef extern from "glbopts.h":
     
     ctypedef SCS_PROBLEM_DATA Data
     ctypedef SCS_SETTINGS Settings
-    ctypedef SCS_SOL_VARS Sol
+    ctypedef SCS_SOL_VARS c_Sol "Sol"
     ctypedef SCS_INFO Info
     ctypedef SCS_WORK Work
     ctypedef SCS_CONE c_Cone "Cone"
 
 
 cdef extern from "linSys.h":
-    ctypedef A_DATA_MATRIX AMatrix
+    ctypedef A_DATA_MATRIX c_AMatrix "AMatrix"
 
 
 cdef extern from "scs.h":
-    scs_int scs(const Data* d, const c_Cone* k, Sol* sol, Info* info)
+    scs_int scs(const Data* d, const c_Cone* k, c_Sol* sol, Info* info)
     const char * scs_version()
     
     Work * scs_init(const Data* d, const c_Cone* k, Info* info)
-    scs_int scs_solve(Work* w, const Data* d, const c_Cone* k, Sol* sol, Info* info)
+    scs_int scs_solve(Work* w, const Data* d, const c_Cone* k, c_Sol* sol, Info* info)
     void scs_finish(Work * w)
 
     struct SCS_SETTINGS:
@@ -38,7 +38,7 @@ cdef extern from "scs.h":
     struct SCS_PROBLEM_DATA:
         # these cannot change for multiple runs for the same call to scs_init
         scs_int m, n # A has m rows, n cols
-        AMatrix * A # A is supplied in data format specified by linsys solver
+        c_AMatrix * A # A is supplied in data format specified by linsys solver
 
         # these can change for multiple runs for the same call to scs_init
         scs_float * b

@@ -14,23 +14,23 @@ def solve(dict data, dict cone, dict sol, dict settings):
 
     A = data['A']    
     m, n = A.shape
-    cdef AMatrix _A = make_amatrix(A.data, A.indices, A.indptr, m, n)
+    c_A = stuff_c_amatrix(A.data, A.indices, A.indptr, m, n)
 
     cdef scs_float[:] b = data['b']
     cdef scs_float[:] c = data['c']
 
     cdef Settings _settings = settings
 
-    cdef Data _data = Data(m, n, &_A, &b[0], &c[0], &_settings)
+    cdef Data _data = Data(m, n, &c_A, &b[0], &c[0], &_settings)
 
-    cdef Sol _sol = make_sol(sol['x'], sol['y'], sol['s'])
+    c_sol = stuff_c_sol(sol)
 
     cdef Info _info
 
-    c_cone = dict2c_cone(cone)
+    c_cone = stuff_c_cone(cone)
 
     # write to sol and info
-    scs(&_data, &c_cone, &_sol, &_info)
+    scs(&_data, &c_cone, &c_sol, &_info)
 
     sol['info'] = _info
 
@@ -38,7 +38,7 @@ def solve(dict data, dict cone, dict sol, dict settings):
 
 
 # 3 function stuff structures, memory belongs elsewhere
-cdef c_Cone dict2c_cone(dict cone):
+cdef c_Cone stuff_c_cone(dict cone):
     cdef:
         c_Cone c_cone
         scs_int[:] q
@@ -74,16 +74,21 @@ cdef c_Cone dict2c_cone(dict cone):
 
 
 
-cdef Sol make_sol(scs_float[:] x, scs_float[:] y, scs_float[:] s):
-    cdef Sol sol = Sol(&x[0], &y[0], &s[0])
-    return sol
+cdef c_Sol stuff_c_sol(dict sol):
+    cdef:
+        scs_float[:] x = sol['x']
+        scs_float[:] y = sol['y']
+        scs_float[:] s = sol['s']
+        c_Sol c_sol = c_Sol(&x[0], &y[0], &s[0])
 
-cdef AMatrix make_amatrix(scs_float[:] data, scs_int[:] ind, scs_int[:] indptr, scs_int m, scs_int n):
+    return c_sol
+
+cdef c_AMatrix stuff_c_amatrix(scs_float[:] data, scs_int[:] ind, scs_int[:] indptr, scs_int m, scs_int n):
     # Amatrix is not really big, so there's no need to dynamically allocate it.
     # difference with C/python? don't need to make this dynamically declared?
     # maybe fill a local array and then memcopy to dynamically allocated array
-    cdef AMatrix cA = AMatrix(&data[0], &ind[0], &indptr[0], m, n)
-    return cA
+    cdef c_AMatrix c_A = c_AMatrix(&data[0], &ind[0], &indptr[0], m, n)
+    return c_A
 
 
 
@@ -95,7 +100,7 @@ cdef class Workspace:
         Settings settings
 
         readonly Info info
-        AMatrix _A
+        c_AMatrix c_A
 
         Data _data
 
@@ -106,14 +111,14 @@ cdef class Workspace:
 
         A = data['A']
         m,n = A.shape
-        self._A = make_amatrix(A.data, A.indices, A.indptr, m, n)
+        self.c_A = stuff_c_amatrix(A.data, A.indices, A.indptr, m, n)
 
         cdef scs_float[:] b = data['b']
         cdef scs_float[:] c = data['c']
 
-        self._data = Data(m, n, &self._A, &b[0], &c[0], &self.settings)
+        self._data = Data(m, n, &self.c_A, &b[0], &c[0], &self.settings)
 
-        c_cone = dict2c_cone(cone)
+        c_cone = stuff_c_cone(cone)
 
         self._work = scs_init(&self._data, &c_cone, &self.info)
 
@@ -131,10 +136,8 @@ cdef class Workspace:
         self._data.b = &b[0]
         self._data.c = &c[0]
         
-        c_sol = make_sol(sol['x'], sol['y'], sol['s'])
-
-        # auto type inference?
-        c_cone = dict2c_cone(cone)
+        c_sol = stuff_c_sol(sol)
+        c_cone = stuff_c_cone(cone)
 
         # write to sol and info
         scs_solve(self._work, &self._data, &c_cone, &c_sol, &self.info)
