@@ -257,3 +257,6 @@ Out[7]:
   - more explit import of C functions and structs
   - won't need to quote alias Cone
 - python layer makes copy of cone arrays for Cython layer to use to pass off to C layer
+
+# Tue Apr 19 15:54:07 2016
+- todo: make a test to make sure that updating the settings between calls to workspace.solve works.

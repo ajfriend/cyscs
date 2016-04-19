@@ -3,7 +3,7 @@ cdef extern from "glbopts.h":
     ctypedef long scs_int
     
     ctypedef SCS_PROBLEM_DATA c_Data "Data"
-    ctypedef SCS_SETTINGS Settings
+    ctypedef SCS_SETTINGS c_Settings "Settings"
     ctypedef SCS_SOL_VARS c_Sol "Sol"
     ctypedef SCS_INFO Info
     ctypedef SCS_WORK Work
@@ -44,7 +44,7 @@ cdef extern from "scs.h":
         scs_float * b
         scs_float * c # dense arrays for b (size m), c (size n)
 
-        Settings * stgs # contains solver settings specified by user
+        c_Settings * stgs # contains solver settings specified by user
 
     # contains primal-dual solution arrays */
     struct SCS_SOL_VARS:

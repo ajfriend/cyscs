@@ -212,7 +212,7 @@ class Workspace(object):
 
     @property
     def info(self):
-        return self._work.info
+        return self._work.c_info
 
     @property
     def settings(self):
