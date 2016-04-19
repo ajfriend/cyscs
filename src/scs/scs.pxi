@@ -27,54 +27,50 @@ def solve(dict data, dict cone, dict sol, dict settings):
 
     cdef Info _info
 
-    cdef c_Cone c_cone = form_c_Cone(cone)
+    c_cone = dict2c_cone(cone)
 
-    cdef scs_int result = scs(&_data, &c_cone, &_sol, &_info)
+    # write to sol and info
+    scs(&_data, &c_cone, &_sol, &_info)
 
     sol['info'] = _info
 
     return sol
 
-# todo: lightweight wrapper object for cones is the way to go.
-# don't want to put all the cone functionality in here, since we
-# need to compile the class for each int/float combo
-# rename to cone stuffer?
-cdef class Cone:
-    """
-    - expects input to by numpy arrays where approrpiate
-    """
+
+# 3 function stuff structures, memory belongs elsewhere
+cdef c_Cone dict2c_cone(dict cone):
     cdef:
         c_Cone c_cone
+        scs_int[:] q
+        scs_int[:] s
+        scs_float[:] p
 
-    def __cinit__(self,
-                  scs_int f=0,
-                  scs_int l=0,
-                  scs_int[:] q=None,
-                  scs_int[:] s=None,
-                  scs_float[:] p=None,
-                  scs_int ep=0,
-                  scs_int ed=0):
+    c_cone = c_Cone(f=0, l=0, ep=0, ed=0,
+                    q=NULL, qsize=0,
+                    s=NULL, ssize=0,
+                    p=NULL, psize=0)
 
-        self.c_cone = c_Cone(f=f, l=l, ep=ep, ed=ed,
-                           q=NULL, qsize=0,
-                           s=NULL, ssize=0,
-                           p=NULL, psize=0)
+    c_cone.f = cone.get('f', 0)
+    c_cone.l = cone.get('l', 0)
+    c_cone.ep = cone.get('ep', 0)
+    c_cone.ed = cone.get('ed', 0)
 
-        # todo: check for positive size?
-        if q is not None:
-            self.c_cone.qsize = q.shape[0]
-            self.c_cone.q = &q[0]
+    if 'q' in cone:
+        q = cone['q']
+        c_cone.qsize = q.shape[0]
+        c_cone.q = &q[0]
 
-        if s is not None:
-            self.c_cone.ssize = s.shape[0]
-            self.c_cone.s = &s[0]
+    if 's' in cone:
+        s = cone['s']
+        c_cone.ssize = s.shape[0]
+        c_cone.s = &s[0]
 
-        if p is not None:
-            self.c_cone.psize = p.shape[0]
-            self.c_cone.p = &p[0]
+    if 'p' in cone:
+        p = cone['p']
+        c_cone.psize = p.shape[0]
+        c_cone.p = &p[0]
 
-cdef c_Cone form_c_Cone(dict cone):
-    return Cone(**cone).c_cone    
+    return c_cone    
 
 
 
@@ -117,8 +113,7 @@ cdef class Workspace:
 
         self._data = Data(m, n, &self._A, &b[0], &c[0], &self.settings)
 
-        # make cython cone (really need to disambiguate)
-        cdef c_Cone c_cone = form_c_Cone(cone)
+        c_cone = dict2c_cone(cone)
 
         self._work = scs_init(&self._data, &c_cone, &self.info)
 
@@ -136,9 +131,10 @@ cdef class Workspace:
         self._data.b = &b[0]
         self._data.c = &c[0]
         
-        cdef Sol _sol = make_sol(sol['x'], sol['y'], sol['s'])
+        c_sol = make_sol(sol['x'], sol['y'], sol['s'])
 
-        cdef c_Cone c_cone = form_c_Cone(cone)
+        # auto type inference?
+        c_cone = dict2c_cone(cone)
 
         # write to sol and info
-        scs_solve(self._work, &self._data, &c_cone, &_sol, &self.info)
+        scs_solve(self._work, &self._data, &c_cone, &c_sol, &self.info)
