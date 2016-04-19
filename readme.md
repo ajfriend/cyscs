@@ -230,3 +230,5 @@ sol = scs.solve(data, cone)
 ```
 
 solves a simple least L1-norm problem.
+
+## Python GIL

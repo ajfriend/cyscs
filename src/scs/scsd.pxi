@@ -7,7 +7,7 @@ cdef extern from "glbopts.h":
     ctypedef SCS_SOL_VARS Sol
     ctypedef SCS_INFO Info
     ctypedef SCS_WORK Work
-    ctypedef SCS_CONE _Cone "Cone"
+    ctypedef SCS_CONE c_Cone "Cone"
 
 
 cdef extern from "linSys.h":
@@ -15,11 +15,11 @@ cdef extern from "linSys.h":
 
 
 cdef extern from "scs.h":
-    scs_int scs(const Data* d, const _Cone* k, Sol* sol, Info* info)
+    scs_int scs(const Data* d, const c_Cone* k, Sol* sol, Info* info)
     const char * scs_version()
     
-    Work * scs_init(const Data* d, const _Cone* k, Info* info)
-    scs_int scs_solve(Work* w, const Data* d, const _Cone* k, Sol* sol, Info* info)
+    Work * scs_init(const Data* d, const c_Cone* k, Info* info)
+    scs_int scs_solve(Work* w, const Data* d, const c_Cone* k, Sol* sol, Info* info)
     void scs_finish(Work * w)
 
     struct SCS_SETTINGS:

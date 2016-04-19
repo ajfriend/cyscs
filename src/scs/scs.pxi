@@ -27,9 +27,9 @@ def solve(dict data, dict cone, dict sol, dict settings):
 
     cdef Info _info
 
-    _cone = Cone(**cone)
+    cdef c_Cone c_cone = form_c_Cone(cone)
 
-    cdef scs_int result = scs(&_data, &_cone._cone, &_sol, &_info)
+    cdef scs_int result = scs(&_data, &c_cone, &_sol, &_info)
 
     sol['info'] = _info
 
@@ -44,7 +44,7 @@ cdef class Cone:
     - expects input to by numpy arrays where approrpiate
     """
     cdef:
-        _Cone _cone
+        c_Cone c_cone
 
     def __cinit__(self,
                   scs_int f=0,
@@ -55,23 +55,26 @@ cdef class Cone:
                   scs_int ep=0,
                   scs_int ed=0):
 
-        self._cone = _Cone(f=f, l=l, ep=ep, ed=ed,
+        self.c_cone = c_Cone(f=f, l=l, ep=ep, ed=ed,
                            q=NULL, qsize=0,
                            s=NULL, ssize=0,
                            p=NULL, psize=0)
 
         # todo: check for positive size?
         if q is not None:
-            self._cone.qsize = q.shape[0]
-            self._cone.q = &q[0]
+            self.c_cone.qsize = q.shape[0]
+            self.c_cone.q = &q[0]
 
         if s is not None:
-            self._cone.ssize = s.shape[0]
-            self._cone.s = &s[0]
+            self.c_cone.ssize = s.shape[0]
+            self.c_cone.s = &s[0]
 
         if p is not None:
-            self._cone.psize = p.shape[0]
-            self._cone.p = &p[0]
+            self.c_cone.psize = p.shape[0]
+            self.c_cone.p = &p[0]
+
+cdef c_Cone form_c_Cone(dict cone):
+    return Cone(**cone).c_cone    
 
 
 
@@ -115,9 +118,9 @@ cdef class Workspace:
         self._data = Data(m, n, &self._A, &b[0], &c[0], &self.settings)
 
         # make cython cone (really need to disambiguate)
-        _cone = Cone(**cone)
+        cdef c_Cone c_cone = form_c_Cone(cone)
 
-        self._work = scs_init(&self._data, &_cone._cone, &self.info)
+        self._work = scs_init(&self._data, &c_cone, &self.info)
 
         if self._work == NULL:
             raise MemoryError("Memory error in allocating Workspace.")
@@ -126,7 +129,7 @@ cdef class Workspace:
         if self._work != NULL:
             scs_finish(self._work);
 
-    # this is weird and inconsistent. why no cone?
+
     def solve(self, scs_float[:] b, scs_float[:] c, dict cone, dict sol, dict settings):
         self.settings = settings
         self._data.stgs = &self.settings
@@ -135,7 +138,7 @@ cdef class Workspace:
         
         cdef Sol _sol = make_sol(sol['x'], sol['y'], sol['s'])
 
-        _cone = Cone(**cone)
+        cdef c_Cone c_cone = form_c_Cone(cone)
 
         # write to sol and info
-        scs_solve(self._work, &self._data, &_cone._cone, &_sol, &self.info)
+        scs_solve(self._work, &self._data, &c_cone, &_sol, &self.info)
