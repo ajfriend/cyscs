@@ -260,3 +260,7 @@ Out[7]:
 
 # Tue Apr 19 15:54:07 2016
 - todo: make a test to make sure that updating the settings between calls to workspace.solve works.
+- add tests for data immutability.
+- todo: figure out what to do about formatting proper input data
+- test warm starting data immutability
+- figure out what `check_data` is doign

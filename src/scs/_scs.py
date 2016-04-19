@@ -78,17 +78,17 @@ def default_settings():
                        alpha = 1.5,
                        cg_rate = 2.0,
                        verbose = True,
-                       warm_start = False,
+                       #warm_start = False,
                        use_indirect=False)
     return stg_default
 
-def solve(data, cone, sol=None, **settings):
+"""
+python level always 
+"""
+def solve(data, cone, warm_start=None, **settings):
     stg = default_settings()
     stg.update(settings)
 
-    # switch on the direct/indirect solver
-    # even though Cone is identical between the two solvers, they compiled to
-    # different types, so we get a type mismatch if we try to mix them
     if stg['use_indirect']:
         cy = scs._indirect
     else:
@@ -100,12 +100,19 @@ def solve(data, cone, sol=None, **settings):
     # woah! wipes the 'data' dictionary
     data = check_data(data, cone)
 
-    # todo: sol prep should be done at python level?
-    if sol is None:
-        m, n = data['A'].shape
-        sol = dict(x=np.zeros(n), y=np.zeros(m), s=np.zeros(m))
+    m, n = data['A'].shape
+    sol = dict(x=np.zeros(n), y=np.zeros(m), s=np.zeros(m))
+    stg['warm_start'] = True
 
-    return cy.solve(data, cone, sol, stg)
+    # copy (and do not modify) warm-start vectors
+    if warm_start:
+        for key in 'x', 'y', 's':
+            sol[key][:] = warm_start[key]
+
+    # updates the sol dict
+    cy.solve(data, cone, sol, stg)
+
+    return sol
 
 def not_met(*vargs):
     return not all(vargs)
