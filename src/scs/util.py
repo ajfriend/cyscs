@@ -75,29 +75,32 @@ def cone_len(cone):
 def not_met(*vargs):
     return not all(vargs)
 
-# todo: does this change the data?
+
 def check_data(data, cone):
-    """
-    tries to skip copying if it can avoid?
-    we need to check in the workspace again
-    what do we do with the newly created data?
+    """ Check the correctness of input data.
+    A is CSC with int64 indices and float64 values
+    b,c are float64 vectors, with correct sizes
+
+    If all datatypes are OK, returns *new* dictionary with *same* A, b, c objects.
+    Otherwise, returns *new* dictionary with *new* A, b, c objects, so as
+    not to modify the original data.
     """
     # data has elements A, b, c
     if not_met('A' in data, 'b' in data, 'c' in data):
-        raise TypeError("Missing one or more of A, b, c from data dictionary")
+        raise TypeError("Missing one or more of A, b, or c from data dictionary.")
 
     A = data['A']
     b = data['b']
     c = data['c']
 
     if A is None or b is None or c is None:
-        raise TypeError("Incomplete data specification")
+        raise TypeError("Incomplete data specification.")
 
     if not sp.issparse(A):
-        raise TypeError("A is required to be a sparse matrix")
+        raise TypeError("A is required to be a scipy sparse matrix.")
 
     if not sp.isspmatrix_csc(A):
-        warn("Converting A to a CSC (compressed sparse column) matrix; may take a while.")
+        warn("Converting A to a scipy CSC (compressed sparse column) matrix; may take a while.")
         A = A.tocsc()
 
     if sp.issparse(b):
@@ -120,18 +123,22 @@ def check_data(data, cone):
 
     if not_met(A.indptr.dtype == np.int64, A.indices.dtype == np.int64):
         warn("Converting A.indptr and A.indices to arrays with dtype = numpy.int64")
+        # copy the matrix to avoid modifying original
+        A = sp.csc_matrix(A)
         A.indptr = A.indptr.astype(np.int64)
         A.indices = A.indices.astype(np.int64)
 
     if not_met(A.data.dtype == np.float64):
         warn("Converting A.data to array with dtype = numpy.float64")
+        # copy the matrix to avoid modifying original
+        A = sp.csc_matrix(A)
         A.data = A.data.astype(np.float64)
 
     if not_met(cone_len(cone) > 0, A.shape[0] == cone_len(cone)):
         raise ValueError('The cones must match the number of rows of A.')
 
-    # return modified data if we needed to convert anything
-    data = dict(data) # make a shallow copy of the dictionary
 
-    data.update(A=A,b=b,c=c)
-    return data
+    # return a dict of (possibly modified) problem data
+    # we do not modify the original dictionary or the original numpy arrays or matrices
+    # if no modifications are needed, these are the *same* A, b, c matrices
+    return dict(A=A,b=b,c=c)
