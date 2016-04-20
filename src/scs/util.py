@@ -19,13 +19,16 @@ def default_settings():
                        use_indirect=False)
     return stg_default
 
-# todo: rename to format cone
-# this does make a **copy**...
-def make_cone(cone_in):
-    # only move over the keys we expect
-    # don't move over keys not present
-    # no empty arrays, just don't move over
 
+def format_and_copy_cone(cone_in):
+    """ Make a cone dictionary with the proper keys and numpy arrays.
+
+    Converts from cones with q,s,p as lists or numpy arrays with improper type.
+
+    Makes a *deep* copy, creating and copying data for numpy arrays.
+
+    Only contains nontrivial keys. (No empty arrays or zero values.)
+    """
     cone_out = {}
 
     for key in 'f', 'l', 'ep', 'ed':
@@ -41,7 +44,6 @@ def make_cone(cone_in):
 
     return cone_out
 
-# not in public interface..
 def cone_len(cone):
     total = 0
 
@@ -75,6 +77,11 @@ def not_met(*vargs):
 
 # todo: does this change the data?
 def check_data(data, cone):
+    """
+    tries to skip copying if it can avoid?
+    we need to check in the workspace again
+    what do we do with the newly created data?
+    """
     # data has elements A, b, c
     if not_met('A' in data, 'b' in data, 'c' in data):
         raise TypeError("Missing one or more of A, b, c from data dictionary")
@@ -120,7 +127,6 @@ def check_data(data, cone):
         warn("Converting A.data to array with dtype = numpy.float64")
         A.data = A.data.astype(np.float64)
 
-    # todo: whats up with this len calcuation?
     if not_met(cone_len(cone) > 0, A.shape[0] == cone_len(cone)):
         raise ValueError('The cones must match the number of rows of A.')
 

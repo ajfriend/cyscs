@@ -264,3 +264,4 @@ Out[7]:
 - todo: how to handle the different sets of settings: one has warm_start, and the other doesnt...
 - update the tutorial
 - free the GIL!
+- how to check data again in the workspace (the user could have changed b,c)

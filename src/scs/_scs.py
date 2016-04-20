@@ -5,7 +5,7 @@ import scs._indirect
 
 import numpy as np
 
-from .util import default_settings, make_cone, cone_len, not_met, check_data
+from .util import default_settings, format_and_copy_cone, cone_len, not_met, check_data
 
 """
 ## Notes
@@ -23,7 +23,7 @@ def solve(data, cone, warm_start=None, **settings):
     else:
         cy = scs._direct
 
-    cone = make_cone(cone)
+    cone = format_and_copy_cone(cone)
 
     # todo: decide if we should overwrite data with modified matrices
     # woah! wipes the 'data' dictionary
@@ -63,7 +63,7 @@ class Workspace(object):
         self._fixed = {k: self._settings[k] for k in self._fixed_keys}
 
         # todo: make cone and copy here. internal. can't change
-        self._cone = make_cone(cone)
+        self._cone = format_and_copy_cone(cone)
 
         # todo: why is check data returning something?
         self.data = check_data(data, self._cone)

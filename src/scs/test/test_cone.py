@@ -2,7 +2,7 @@ from __future__ import print_function
 import scs
 import pytest
 
-from scs._scs import cone_len, make_cone
+from scs._scs import cone_len, format_and_copy_cone
 
 def test_size_f():
     n = 13
@@ -32,7 +32,7 @@ def test_size_q():
     n = 13
     m = 3
     c = dict(q=[n,m])
-    c = make_cone(c)
+    c = format_and_copy_cone(c)
 
     assert cone_len(c) == n+m
 
@@ -40,20 +40,20 @@ def test_size_s():
     n = 13
     m = 3
     c = dict(s=[n,m])
-    c = make_cone(c)
+    c = format_and_copy_cone(c)
 
     assert cone_len(c) == (n*(n+1))/2 + (m*(m+1))/2
 
 def test_size_p():
     a = [-.4, .7]
     c = dict(p=a)
-    c = make_cone(c)
+    c = format_and_copy_cone(c)
 
     assert cone_len(c) == 3*len(a)
 
 def test_cone():
     d = dict(f=1, l=20, ep=4, ed=7, q=[3,4,9,10], s=[3,2,4], p=[.1, -.7])
-    c = make_cone(d)
+    c = format_and_copy_cone(d)
 
     expected = (d['f'] + d['l'] + 3*d['ep'] + 3*d['ed'] +
                 sum(d['q']) + len(d['p'])*3 + sum([i*(i+1)/2 for i in d['s']]))
