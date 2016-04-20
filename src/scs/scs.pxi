@@ -24,8 +24,7 @@ def solve(dict data, dict cone, dict sol, dict settings):
 
     return sol
 
-# think about how much of this workspace is exposed to the user...
-# rather than being used by the python layer
+
 cdef class Workspace:
     cdef: #private by default, 'readonly' to make public
         Work * _work

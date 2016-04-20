@@ -40,7 +40,7 @@ def test_many_iter_ecp_tol():
     sol = scs.solve(data, cone, eps=1e-4)
     assert sol['info']['iter'] >= 800
 
-    # ~640 for eps 1e-4
+    # ~640 for eps 1e-3
     sol = scs.solve(data, cone, eps=1e-3)
     assert 500 <= sol['info']['iter'] <= 700
 

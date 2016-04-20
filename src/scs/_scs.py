@@ -82,9 +82,7 @@ def default_settings():
                        use_indirect=False)
     return stg_default
 
-"""
-python level always 
-"""
+
 def solve(data, cone, warm_start=None, **settings):
     stg = default_settings()
     stg.update(settings)
@@ -102,13 +100,13 @@ def solve(data, cone, warm_start=None, **settings):
 
     m, n = data['A'].shape
     sol = dict(x=np.zeros(n), y=np.zeros(m), s=np.zeros(m))
-    stg['warm_start'] = True
-
+    
     # copy (and do not modify) warm-start vectors
     if warm_start:
         for key in 'x', 'y', 's':
             sol[key][:] = warm_start[key]
 
+    stg['warm_start'] = True
     # updates the sol dict
     cy.solve(data, cone, sol, stg)
 
@@ -182,12 +180,13 @@ class Workspace(object):
 
     _fixed_keys = 'use_indirect', 'rho_x', 'normalize', 'scale'
 
-    def __init__(self, data, cone, sol=None, **settings):
+    def __init__(self, data, cone, **settings):
         """ SCS Workspace
         
         """
         self._settings = default_settings()
         self._settings.update(settings)
+
         self._fixed = {k: self._settings[k] for k in self._fixed_keys}
 
         # todo: make cone and copy here. internal. can't change
@@ -195,22 +194,22 @@ class Workspace(object):
 
         # todo: why is check data returning something?
         self.data = check_data(data, self._cone)
-        
-        m, n = data['A'].shape
-        if sol is None:
-            self.sol = dict(x=np.zeros(n), y=np.zeros(m), s=np.zeros(m))
-        else:
-            self.sol = sol            
-        # todo: fixed parameters: rho, normalize, ...
+
+        self._m, self._n = data['A'].shape
 
         # todo: does it make sense to have an indirect workspace?
         # should we only allow `direct` Workspaces
-        if self.settings['use_indirect']:
+        if self._settings['use_indirect']:
             cy = scs._indirect
         else:
             cy = scs._direct
 
+        # todo: wwaaaa
+        self._settings['warm_start'] = True
         self._work = cy.Workspace(self.data, self._cone, self._settings)
+        del self._settings['warm_start']
+
+        del self.data['A']
 
     @property
     def fixed(self):
@@ -233,22 +232,28 @@ class Workspace(object):
             if not self._fixed[key] == self._settings[key]:
                 raise Exception('Setting {} has been changed from Workspace initialization.'.format(key))
 
-    def solve(self, data=None, sol=None, **settings):
+    def solve(self, new_bc=None, warm_start=None, **settings):
         self._settings.update(settings)
         self.check_settings()
 
-        if data is not None:
+        if new_bc is not None:
             for key in 'b', 'c':
-                if key in data:
-                    self.data[key] = data[key]
+                if key in new_bc:
+                    self.data[key] = new_bc[key]
 
-        if sol:
-            self.sol = sol
+        sol = dict(x=np.zeros(self._n), y=np.zeros(self._m), s=np.zeros(self._m))
+        
+        # copy (and do not modify) warm-start vectors
+        if warm_start:
+            for key in 'x', 'y', 's':
+                sol[key][:] = warm_start[key]
 
-        self._work.solve(self.data['b'], self.data['c'], self._cone, self.sol, self.settings)
+        self._settings['warm_start'] = True
+        self._work.solve(self.data['b'], self.data['c'], self._cone, sol, self._settings)
+        del self._settings['warm_start']
 
-        result = dict(self.sol)
-        result['info'] = self.info
+        
+        sol['info'] = self.info
 
-        return result
+        return sol
 

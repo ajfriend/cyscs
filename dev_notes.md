@@ -259,8 +259,8 @@ Out[7]:
 - python layer makes copy of cone arrays for Cython layer to use to pass off to C layer
 
 # Tue Apr 19 15:54:07 2016
-- todo: make a test to make sure that updating the settings between calls to workspace.solve works.
-- add tests for data immutability.
 - todo: figure out what to do about formatting proper input data
-- test warm starting data immutability
 - figure out what `check_data` is doign
+- todo: how to handle the different sets of settings: one has warm_start, and the other doesnt...
+- update the tutorial
+- free the GIL!
