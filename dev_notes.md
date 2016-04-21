@@ -259,13 +259,6 @@ Out[7]:
 - python layer makes copy of cone arrays for Cython layer to use to pass off to C layer
 
 # Tue Apr 19 15:54:07 2016
-- todo: figure out what to do about formatting proper input data
-- figure out what `check_data` is doign
 - todo: how to handle the different sets of settings: one has warm_start, and the other doesnt...
 - update the tutorial
 - free the GIL!
-- how to check data again in the workspace (the user could have changed b,c)
-- add a test for a warning for improperly formatted A
-- add check for b,c and x,y,s formatting
-- also a test for the above
-- 
