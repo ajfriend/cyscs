@@ -3,6 +3,52 @@ import scipy.sparse as sp
 import numpy as np
 
 
+def check_xys(x,y,s,m,n):
+    """ Check that x, y, s are dense numpy arrays of the right shape, length
+    and dtype.
+
+    Raise a value error otherwise.
+
+    """
+    if sp.issparse(x):
+        raise ValueError("x must be a (dense) NumPy ndarray.")
+
+    if sp.issparse(y):
+        raise ValueError("y must be a (dense) NumPy ndarray.")
+
+    if sp.issparse(s):
+        raise ValueError("s must be a (dense) NumPy ndarray.")
+
+    if not_met(x.ndim == 1, y.ndim == 1, s.ndim == 1,
+               x.size == n, y.size == m, s.size == m):
+        raise ValueError("x, y, s must be 1D NumPy ND arrays with sizes matching matrix A.")
+
+    # check that they have the right data type. warn if not and convert
+    if not_met(x.dtype == np.float64, y.dtype == np.float64, s.dtype == np.float64):
+        raise ValueError("x, y, s must be numpy arrays with dtype = numpy.float64")
+
+def check_bc(b,c,m,n):
+    """ Check that b, c are dense numpy arrays of the right shape, length
+    and dtype.
+
+    Raise a value error otherwise.
+
+    """
+    if sp.issparse(b):
+        raise ValueError("b must be a (dense) NumPy ndarray.")
+
+    if sp.issparse(c):
+        raise ValueError("c must be a (dense) NumPy ndarray.")
+
+    if not_met(b.ndim == 1, c.ndim == 1, b.size == m, c.size == n):
+        raise ValueError("b, c must be 1D NumPy ND arrays with sizes matching matrix A.")
+
+    # check that they have the right data type. warn if not and convert
+    if not_met(b.dtype == np.float64, c.dtype == np.float64):
+        raise ValueError("b, c must be numpy arrays with dtype = numpy.float64")
+
+
+
 def default_settings():
     # todo: note that unrecognized keyword argument settings are silently ignored?
     # todo: would be nice to grab defaults from C, but Cython doesn't
@@ -82,8 +128,12 @@ def check_data(data, cone):
     b,c are float64 vectors, with correct sizes
 
     If all datatypes are OK, returns *new* dictionary with *same* A, b, c objects.
-    Otherwise, returns *new* dictionary with *new* A, b, c objects, so as
-    not to modify the original data.
+
+    Raises an *error* if b, or c are incorrectly formatted.
+
+    If A is incorrect, but can be converted, returns a *new* dict with the
+    same b,c arrays, but a *new* A matrix, so as not to modify the original A
+    matrix.
     """
     # data has elements A, b, c
     if not_met('A' in data, 'b' in data, 'c' in data):
@@ -103,23 +153,8 @@ def check_data(data, cone):
         warn("Converting A to a scipy CSC (compressed sparse column) matrix; may take a while.")
         A = A.tocsc()
 
-    if sp.issparse(b):
-        warn("Converting b to a (dense) NumPy ndarray.")
-        b = b.todense()
-
-    if sp.issparse(c):
-        warn("Converting c to a (dense) NumPy ndarray.")
-        c = c.todense()
-
     m,n = A.shape
-    if not_met(b.ndim == 1, c.ndim == 1, b.size == m, c.size == n):
-        raise ValueError("b, c must be 1D NumPy ND arrays with sizes matching matrix A.")
-
-    # check that the have the right data type. warn if not and convert
-    if not_met(b.dtype == np.float64, c.dtype == np.float64):
-        warn("Converting b and c to arrays with dtype = numpy.float64")
-        b = b.astype(np.float64)
-        c = c.astype(np.float64)
+    check_bc(b,c,m,n)
 
     if not_met(A.indptr.dtype == np.int64, A.indices.dtype == np.int64):
         warn("Converting A.indptr and A.indices to arrays with dtype = numpy.int64")

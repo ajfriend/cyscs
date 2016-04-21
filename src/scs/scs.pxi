@@ -26,6 +26,19 @@ def solve(dict data, dict cone, dict sol, dict settings):
 
 
 cdef class Workspace:
+    """ Maintain SCS _work and c_Data structs to keep a reference to the A matrix.
+    Maintain c_settings and b and c only coincidentally, since they are part
+    of the c_data struct; expect that b, c, and settings will be passed
+    in from the Python level, and that the Python level will manage wether
+    those things change between solves.
+
+    This class is designed to be as minimal a wrapper around the C SCS workspace
+    struct as possible, and we delegate as much logic as possible up to the
+    python level.
+
+    Assume that data, cone, and settings have the appropriate formats
+    to be directly converted for use in C.
+    """
     cdef: #private by default, 'readonly' to make public
         Work * _work
         c_Settings c_settings

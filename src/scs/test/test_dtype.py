@@ -7,14 +7,14 @@ def test_b():
     data, cone = ex.simple_lp()
     data['b'] = data['b'].astype(np.float32)
 
-    with pytest.warns(UserWarning):
+    with pytest.raises(ValueError):
         sol = scs.solve(data, cone)
 
 def test_c():
     data, cone = ex.simple_lp()
     data['c'] = data['c'].astype(np.float32)
 
-    with pytest.warns(UserWarning):
+    with pytest.raises(ValueError):
         sol = scs.solve(data, cone)
 
 def test_A_data():

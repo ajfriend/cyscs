@@ -5,13 +5,7 @@ import scs._indirect
 
 import numpy as np
 
-from .util import default_settings, format_and_copy_cone, cone_len, not_met, check_data
-
-"""
-## Notes
-- cy.Cone, cy.Workspace are Cython classes, wrapping the C structs
-- cy.solve is a Cython function, wrapping the C function
-"""
+from .util import default_settings, format_and_copy_cone, cone_len, not_met, check_data, check_xys, check_bc
 
 
 def solve(data, cone, warm_start=None, **settings):
@@ -25,8 +19,9 @@ def solve(data, cone, warm_start=None, **settings):
 
     cone = format_and_copy_cone(cone)
 
-    # todo: decide if we should overwrite data with modified matrices
-    # woah! wipes the 'data' dictionary
+    # creates new data dict
+    # points to *new* array/matrix data if needed
+    # does not modify original matrices/arrays
     data = check_data(data, cone)
 
     m, n = data['A'].shape
@@ -37,13 +32,14 @@ def solve(data, cone, warm_start=None, **settings):
         for key in 'x', 'y', 's':
             sol[key][:] = warm_start[key]
 
+    check_xys(sol['x'], sol['y'], sol['s'], m, n)
+
     stg['warm_start'] = True
+    
     # updates the sol dict
     cy.solve(data, cone, sol, stg)
 
     return sol
-
-
 
 class Workspace(object):
     """
@@ -62,22 +58,19 @@ class Workspace(object):
 
         self._fixed = {k: self._settings[k] for k in self._fixed_keys}
 
-        # todo: make cone and copy here. internal. can't change
         self._cone = format_and_copy_cone(cone)
 
-        # todo: why is check data returning something?
         self.data = check_data(data, self._cone)
 
         self._m, self._n = data['A'].shape
 
         # todo: does it make sense to have an indirect workspace?
-        # should we only allow `direct` Workspaces
+        # should we only allow `direct` Workspaces?
         if self._settings['use_indirect']:
             cy = scs._indirect
         else:
             cy = scs._direct
 
-        # todo: wwaaaa
         self._settings['warm_start'] = True
         self._work = cy.Workspace(self.data, self._cone, self._settings)
         del self._settings['warm_start']
@@ -98,8 +91,6 @@ class Workspace(object):
         self.check_settings()
         return self._settings
 
-    # in fixed, can list (data, 'A') and test that it points to the right numpy array
-    # (cone) also fixed
     def check_settings(self):
         for key in self._fixed:
             if not self._fixed[key] == self._settings[key]:
@@ -120,6 +111,10 @@ class Workspace(object):
         if warm_start:
             for key in 'x', 'y', 's':
                 sol[key][:] = warm_start[key]
+
+
+        check_xys(sol['x'], sol['y'], sol['s'], self._m, self._n)
+        check_bc(self.data['b'],self.data['c'], self._m, self._n)
 
         self._settings['warm_start'] = True
         self._work.solve(self.data['b'], self.data['c'], self._cone, sol, self._settings)

@@ -265,3 +265,7 @@ Out[7]:
 - update the tutorial
 - free the GIL!
 - how to check data again in the workspace (the user could have changed b,c)
+- add a test for a warning for improperly formatted A
+- add check for b,c and x,y,s formatting
+- also a test for the above
+- 
