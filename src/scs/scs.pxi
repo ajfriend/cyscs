@@ -17,8 +17,9 @@ def solve(dict data, dict cone, dict sol, dict settings):
     c_sol = stuff_c_sol(sol)
     c_cone = stuff_c_cone(cone)
 
-    # write to sol and info
-    scs(&c_data, &c_cone, &c_sol, &c_info)
+    with nogil:
+        # write to sol and info
+        scs(&c_data, &c_cone, &c_sol, &c_info)
 
     sol['info'] = c_info
 
@@ -51,14 +52,16 @@ cdef class Workspace:
         self.c_data = stuff_c_data(data, settings, &self.c_A, &self.c_settings)
         c_cone = stuff_c_cone(cone)
 
-        self._work = scs_init(&self.c_data, &c_cone, &self.c_info)
+        with nogil:
+            self._work = scs_init(&self.c_data, &c_cone, &self.c_info)
 
         if self._work == NULL:
             raise MemoryError("Memory error in allocating Workspace.")
 
     def __dealloc__(self):
         if self._work != NULL:
-            scs_finish(self._work);
+            with nogil:
+                scs_finish(self._work);
 
     def solve(self, scs_float[:] b, scs_float[:] c, dict cone, dict sol, dict settings):
         self.c_settings = settings
@@ -68,8 +71,9 @@ cdef class Workspace:
         c_sol = stuff_c_sol(sol)
         c_cone = stuff_c_cone(cone)
 
-        # write to sol and info
-        scs_solve(self._work, &self.c_data, &c_cone, &c_sol, &self.c_info)
+        with nogil:
+            # write to sol and info
+            scs_solve(self._work, &self.c_data, &c_cone, &c_sol, &self.c_info)
 
 
 cdef c_Data stuff_c_data(dict data, dict settings,

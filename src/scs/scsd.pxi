@@ -15,12 +15,12 @@ cdef extern from "linSys.h":
 
 
 cdef extern from "scs.h":
-    scs_int scs(const c_Data* d, const c_Cone* k, c_Sol* sol, Info* info)
+    scs_int scs(const c_Data* d, const c_Cone* k, c_Sol* sol, Info* info) nogil
     const char * scs_version()
     
-    Work * scs_init(const c_Data* d, const c_Cone* k, Info* info)
-    scs_int scs_solve(Work* w, const c_Data* d, const c_Cone* k, c_Sol* sol, Info* info)
-    void scs_finish(Work * w)
+    Work * scs_init(const c_Data* d, const c_Cone* k, Info* info) nogil
+    scs_int scs_solve(Work* w, const c_Data* d, const c_Cone* k, c_Sol* sol, Info* info) nogil
+    void scs_finish(Work * w) nogil
 
     struct SCS_SETTINGS:
         scs_int normalize
