@@ -262,3 +262,14 @@ Out[7]:
 - todo: how to handle the different sets of settings: one has warm_start, and the other doesnt...
 - update the tutorial
 - free the GIL!
+
+# Fri Apr 22 14:16:41 2016
+- test the nogil on workspace and scs.solve
+- notebook examples
+- document 3 level design in code
+- look at the other concurrent futures stuff
+- can build and dispatch to different compile types
+- pip install without numpy ahead of time
+- join paths more better?
+- document that verbose needs to reacquire the gil
+- [nice threadpool hacking by min rk](https://nbviewer.jupyter.org/gist/minrk/9043edb50222aa01349429013174855b)
