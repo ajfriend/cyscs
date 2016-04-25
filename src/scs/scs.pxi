@@ -1,4 +1,6 @@
 def version():
+    """Return the current version of SCS.
+    """
     cdef const char* c_string = scs_version()
     return c_string
 

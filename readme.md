@@ -12,7 +12,7 @@ cones.
 Most users will not interact with SCS directly. The most common use-case is as
 a back-end to a convex optimization modeling framework like [CVXPY](http://www.cvxpy.org).
 
-Advanced users can consult the interface notes below or the [tutorial IPython notebook](tutorial.ipynb). For more complete definitions of the input data format, convex cones, and output variables, please see the [`SCS README`](https://github.com/cvxgrp/scs/blob/master/README.md) or the [SCS Paper](http://web.stanford.edu/~boyd/papers/scs.html).
+Advanced users can consult the interface notes below, the [tutorial IPython notebook](tutorial.ipynb) or the [parallel tutorial IPython notebook](parallel_tutorial.ipynb). For more complete definitions of the input data format, convex cones, and output variables, please see the [`SCS README`](https://github.com/cvxgrp/scs/blob/master/README.md) or the [SCS Paper](http://web.stanford.edu/~boyd/papers/scs.html).
 
 ## Installation
 ### Pip
@@ -232,3 +232,11 @@ sol = scs.solve(data, cone)
 solves a simple least L1-norm problem.
 
 ## Python GIL
+
+`scs.solve()`, `Workspace` initialization, and `Worksapce.solve()` all release the Python GIL when running the underlying C solver code. This allows for multithreaded parallelism, so that multiple SCS problems can be solved at once
+on multicore machines.
+
+Problems can be solved using, for example, the `concurrent.futures.ThreadPoolExecutor` or `concurrent.futures.ProcessPoolExecutor` interfaces.
+Since SCS releases the GIL, we can benefit from using the `ThreadPoolExecutor` since it does not require launching separate python interpreters or the serialization of data for communication between processes. `ProcessPoolExecutor` requires both of these.
+
+For examples, see the [parallel tutorial IPython notebook](parallel_tutorial.ipynb).
