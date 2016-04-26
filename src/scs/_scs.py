@@ -5,7 +5,7 @@ from ._direct import version
 import scs._direct
 import scs._indirect
 
-from .util import (default_settings, format_and_copy_cone,
+from ._util import (default_settings, format_and_copy_cone,
                   cone_len, not_met, check_data, check_xys, check_bc)
 
 

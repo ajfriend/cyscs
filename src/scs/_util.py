@@ -1,3 +1,6 @@
+""" Internal utilities for checking that input data is valid.
+"""
+
 from warnings import warn
 import scipy.sparse as sp
 import numpy as np

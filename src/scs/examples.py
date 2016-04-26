@@ -1,3 +1,11 @@
+""" Data for example problems that can be solved with SCS.
+
+Demonstrates proper input format (particularly for SDP).
+Also used for testing and benchmarking.
+
+Functions return cone, data, and (possibly) the known solution.
+"""
+
 import numpy as np
 import scipy.sparse as sp
 
