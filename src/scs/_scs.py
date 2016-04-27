@@ -1,3 +1,27 @@
+""" Python layer of the SCS interface.
+
+Code Organization
+-----------------
+
+This SCS Cython interface is broken up into three layers:
+- the C SCS layer of underlying C code
+- the Cython wrapper layer exposing the C code to python
+- the Python layer, which depends on the Cython layer, providing a nice user interface
+
+The Cython layer is intended to be as **light** a wrapper around
+the C code as possible. This mostly involves calling C functions
+and converting dictionaries to the appropriate C structs.
+There is also a **Cython** `Workspace` class which encapsulates the
+various C structs and cleans up memory when garbage collected.
+The **Python** `Workspace` class contains an instance of the 
+**Cython** `Workspace`.
+
+The Python layer provides various datatype conversion functionality,
+a nice user interface, and checks for data correctness.
+The hope is to keep as much of this logic in the Python level as possible,
+for easy maintenance.
+"""
+
 import numpy as np
 
 from ._direct import version
