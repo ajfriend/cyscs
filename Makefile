@@ -3,8 +3,8 @@
 all: reinstall test
 
 clean:
-	-pip uninstall scs
-	$(RM) -rf src/*.egg-info src/scs/*.pyc *.pyc dist build src/scs/*.c scs/*.so src/scs/__pycache__ .cache/ test/__pycache__ __pycache__ test/*.pyc test/__pycache__
+	-pip uninstall cyscs
+	$(RM) -rf src/*.egg-info src/cyscs/*.pyc *.pyc dist build src/cyscs/*.c cyscs/*.so src/cyscs/__pycache__ .cache/ test/__pycache__ __pycache__ test/*.pyc test/__pycache__
 
 reinstall: clean
 	python setup.py install --cython
@@ -12,11 +12,11 @@ reinstall: clean
 # can run -vs, where s makes it not capture output
 # the -l flag will print out a list of local variables with their corresponding values when a test fails
 test:
-	py.test --pyargs scs -l
+	py.test --pyargs cyscs -l
 
 sdist: clean
 	python setup.py sdist --cython
-	tar -zxvf dist/scs-1.1.8.tar.gz -C dist/
+	tar -zxvf dist/cyscs-1.1.8.tar.gz -C dist/
 
 wheel: clean
 	python setup.py bdist_wheel --cython

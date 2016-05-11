@@ -1,8 +1,7 @@
 from __future__ import print_function
-import scs
 import pytest
 
-from scs._scs import cone_len, format_and_copy_cone
+from cyscs._scs import cone_len, format_and_copy_cone
 
 def test_size_f():
     n = 13

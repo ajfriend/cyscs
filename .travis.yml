@@ -25,8 +25,8 @@ install:
   - if [[ $SDIST == true ]]; then python setup.py sdist --cython && find ./dist -iname "*.gz" | xargs -0 pip install; fi
   - if [[ $SDIST == false ]]; then python setup.py install --cython; fi
 script:
-  - py.test src/scs/test # run tests directly from test folder
-  - py.test --pyargs scs # make sure that tests can run from installed package (as if user pip installed)
+  - py.test src/cyscs/test # run tests directly from test folder
+  - py.test --pyargs cyscs # make sure that tests can run from installed package (as if user pip installed)
 cache:
   - apt
   - directories:

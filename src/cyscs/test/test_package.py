@@ -1,8 +1,8 @@
 def test_import():
-    import scs
+    import cyscs
 
 def test_version():
-    import scs
+    import cyscs
     import pkg_resources
 
-    assert scs.version() == pkg_resources.require("scs")[0].version
+    assert cyscs.version() == pkg_resources.require("cyscs")[0].version

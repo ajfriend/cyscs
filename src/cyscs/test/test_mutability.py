@@ -1,6 +1,6 @@
-import scs
+import cyscs as scs
 import pytest
-import scs.examples as ex
+import cyscs.examples as ex
 import numpy as np
 
 

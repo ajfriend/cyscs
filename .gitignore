@@ -23,6 +23,7 @@ var/
 *.egg
 
 env/
+env2
 env3/
 env_test/
 .cache/
