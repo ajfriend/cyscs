@@ -1,9 +1,9 @@
-""" Python layer of the SCS interface.
+""" Python layer of the cySCS interface.
 
 Code Organization
 -----------------
 
-This SCS Cython interface is broken up into three layers:
+This cySCS Cython interface is broken up into three layers:
 - the C SCS layer of underlying C code
 - the Cython wrapper layer exposing the C code to python
 - the Python layer, which depends on the Cython layer, providing a nice user interface
@@ -44,7 +44,7 @@ def solve(data, cone, warm_start=None, **settings):
     cone : dict
         Dictionary describing the sizes of the conic constraints.
         Optional Keys: `f`, `l`, `q`, `s, `ep`, `ed`, `p`.
-        See the documentation or `scs.examples` for more information.
+        See the documentation or `cyscs.examples` for more information.
     warm_start : Optional[dict]
         Warm start the solver with arrays `x`, `y`, `s`.
         All three arrays must be present.
@@ -52,7 +52,7 @@ def solve(data, cone, warm_start=None, **settings):
     **settings
         Settings can be given as keyword arguments.
         For the possible keys, see the documentation and
-        `scs.default_settings()`.
+        `cyscs.default_settings()`.
 
     Returns
     -------
@@ -114,7 +114,7 @@ class Workspace(object):
     **settings
         Settings can be given as keyword arguments.
         For the possible keys, see the documentation and
-        `scs.default_settings()`.
+        `cyscs.default_settings()`.
 
     Attributes
     ----------
@@ -201,7 +201,7 @@ class Workspace(object):
         **settings
             Settings can be given as keyword arguments.
             For the possible keys, see the documentation and
-            `scs.default_settings()`.
+            `cyscs.default_settings()`.
             Will replace settings in `Workspace.settings`, so changes
             persist after the call to `solve()`.
 
