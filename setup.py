@@ -43,15 +43,15 @@ ext['include_dirs'] += [numpy.get_include()]
 # deep copy so that the dictionaries do not point to the same list objects
 ext_direct = copy.deepcopy(ext)
 # next two names need to match
-ext_direct['name'] = 'scs._direct'
-ext_direct['sources'] += ['src/scs/_direct' + file_ext]
+ext_direct['name'] = 'cyscs._direct'
+ext_direct['sources'] += ['src/cyscs/_direct' + file_ext]
 ext_direct['sources'] += glober(rootDir, ['linsys/direct/*.c', 'linsys/direct/external/*.c'])
 ext_direct['include_dirs'] += glober(rootDir, ['linsys/direct/', 'linsys/direct/external/'])
 
 
 ext_indirect = copy.deepcopy(ext)
-ext_indirect['name'] = 'scs._indirect'
-ext_indirect['sources'] += ['src/scs/_indirect' + file_ext]
+ext_indirect['name'] = 'cyscs._indirect'
+ext_indirect['sources'] += ['src/cyscs/_indirect' + file_ext]
 ext_indirect['sources'] += glober(rootDir, ['linsys/indirect/*.c'])
 ext_indirect['include_dirs'] += glober(rootDir, ['linsys/indirect/'])
 ext_indirect['define_macros'] += [('INDIRECT', None)]
@@ -66,16 +66,16 @@ if USE_CYTHON:
     extensions = cythonize(extensions, compiler_directives={'c_string_type':'unicode', 'c_string_encoding':'utf8'})
 
 
-setup(name='scs',
+setup(name='cyscs',
         version='1.2.3',
         author = 'AJ Friend',
         author_email = 'ajfriend@gmail.com',
         url = 'http://github.com/ajfriend/cyscs',
         description='cySCS: A Cython wrapper for the SCS convex optimization solver.',
-        packages=['scs'],
+        packages=['cyscs'],
 #        py_modules=['scs.examples'],
         package_dir={'': 'src'},
-        package_data={'scs': ['test/*.py']},
+        package_data={'cyscs': ['test/*.py']},
         zip_safe=False,
         ext_modules=extensions,
         install_requires=["numpy >= 1.7","scipy >= 0.13.2"],

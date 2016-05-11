@@ -26,8 +26,8 @@ import numpy as np
 
 from ._direct import version
 
-import scs._direct
-import scs._indirect
+import cyscs._direct
+import cyscs._indirect
 
 from ._util import (default_settings, format_and_copy_cone,
                   cone_len, not_met, check_data, check_xys, check_bc)
@@ -64,9 +64,9 @@ def solve(data, cone, warm_start=None, **settings):
     stg.update(settings)
 
     if stg['use_indirect']:
-        cy = scs._indirect
+        cy = cyscs._indirect
     else:
-        cy = scs._direct
+        cy = cyscs._direct
 
     cone = format_and_copy_cone(cone)
 
@@ -110,7 +110,7 @@ class Workspace(object):
     cone : dict
         Dictionary describing the sizes of the conic constraints.
         Optional Keys: `f`, `l`, `q`, `s, `ep`, `ed`, `p`.
-        See the documentation or `scs.examples` for more information.
+        See the documentation or `cyscs.examples` for more information.
     **settings
         Settings can be given as keyword arguments.
         For the possible keys, see the documentation and
@@ -155,9 +155,9 @@ class Workspace(object):
         # todo: does it make sense to have an indirect workspace?
         # should we only allow `direct` Workspaces?
         if self._settings['use_indirect']:
-            cy = scs._indirect
+            cy = cyscs._indirect
         else:
-            cy = scs._direct
+            cy = cyscs._direct
 
         self._settings['warm_start'] = True
         self._work = cy.Workspace(self.data, self._cone, self._settings)
