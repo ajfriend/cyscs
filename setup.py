@@ -4,6 +4,8 @@ import copy
 from collections import defaultdict
 import sys
 from setup_helper import glober, add_blas_lapack_info
+import os
+
 import numpy
 
 # ext is a dictionary collecting the keyword arguments that will be passed into 
@@ -79,11 +81,7 @@ setup(name='cyscs',
         ext_modules=extensions,
         install_requires=["numpy >= 1.7","scipy >= 0.13.2"],
         license = "MIT",
-        long_description=("""
-Solves convex cone programs via operator splitting.
-Can solve: linear programs (LPs), second-order cone programs (SOCPs),
-semidefinite programs (SDPs), exponential cone programs (ECPs), and
-power cone programs (PCPs), or problems with any combination of those
-cones. See http://github.com/cvxgrp/scs for more details.""")
-        )
+        long_description=(open('README.md').read()
+                        if os.path.exists('README.md')
+                        else ''))
 

@@ -1,7 +1,10 @@
 # CySCS
 [![Build Status](https://travis-ci.org/ajfriend/cyscs.svg?branch=master)](https://travis-ci.org/ajfriend/cyscs)
 
-`cyscs` is a Python interface, written in Cython, for [SCS](https://github.com/cvxgrp/scs), a numerical optimization package written in C for solving convex cone problems.
+`cyscs` is a Python interface, written in Cython, for [SCS](https://github.com/cvxgrp/scs), a numerical optimization package written in C for solving convex cone problems. The main advantage of this interface over the existing
+Python interface is the `Workspace` object, which allows for re-use
+of matrix factorizations, which can reduce solve time when applied
+a sequence of related problems.
 
 SCS solves convex cone programs via operator splitting.
 It can solve: linear programs (LPs), second-order cone programs (SOCPs),
