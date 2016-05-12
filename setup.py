@@ -67,11 +67,11 @@ if USE_CYTHON:
 
 
 setup(name='cyscs',
-        version='1.2.6',
+        version='0.1',
         author = 'AJ Friend',
         author_email = 'ajfriend@gmail.com',
         url = 'http://github.com/ajfriend/cyscs',
-        description='cySCS: A Cython wrapper for the SCS convex optimization solver.',
+        description='CySCS: A Cython wrapper for the SCS convex optimization solver.',
         packages=['cyscs'],
 #        py_modules=['scs.examples'],
         package_dir={'': 'src'},

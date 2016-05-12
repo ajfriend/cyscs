@@ -53,6 +53,8 @@ def check_bc(b,c,m,n):
 
 
 def default_settings():
+    """ Return a *copy* of the dictionary of the default CySCS solver settings.
+    """
     # todo: note that unrecognized keyword argument settings are silently ignored?
     # todo: would be nice to grab defaults from C, but Cython doesn't
     # actually read C headerfiles, so it can't get the SCS macros

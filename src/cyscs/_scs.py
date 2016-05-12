@@ -1,4 +1,4 @@
-""" Python layer of the cySCS interface.
+""" Python layer of the CySCS interface.
 
 Code Organization
 -----------------
@@ -21,16 +21,23 @@ a nice user interface, and checks for data correctness.
 The hope is to keep as much of this logic in the Python level as possible,
 for easy maintenance.
 """
+import pkg_resources
 
 import numpy as np
 
-from ._direct import version
+from ._direct import version as scs_version
 
 import cyscs._direct
 import cyscs._indirect
 
 from ._util import (default_settings, format_and_copy_cone,
                   cone_len, not_met, check_data, check_xys, check_bc)
+
+
+def version():
+    """ Returns the current version of the CySCS Python wrapper.
+    """
+    return pkg_resources.get_distribution("cyscs").version
 
 
 def solve(data, cone, warm_start=None, **settings):
