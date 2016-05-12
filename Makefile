@@ -14,10 +14,11 @@ reinstall: clean
 test:
 	py.test --pyargs cyscs -l
 
-sdist: clean
+sdist:
 	python setup.py sdist --cython
-	tar -zxvf dist/cyscs-1.1.8.tar.gz -C dist/
+	# the line below unpacks the sdist (i was wanting to inspect it manually)
+	#tar -zxvf dist/cyscs-*.tar.gz -C dist/
 
-wheel: clean
+wheel:
 	python setup.py bdist_wheel --cython
 	# install in virtualenv with pip install dist/scs-1.1.8-....whl

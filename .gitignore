@@ -25,5 +25,6 @@ var/
 env/
 env2
 env3/
+env_nocython/
 env_test/
 .cache/

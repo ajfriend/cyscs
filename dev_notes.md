@@ -273,3 +273,27 @@ Out[7]:
 - join paths more better?
 - document that verbose needs to reacquire the gil
 - [nice threadpool hacking by min rk](https://nbviewer.jupyter.org/gist/minrk/9043edb50222aa01349429013174855b)
+
+# Wed May 11 20:22:44 2016
+- https://hynek.me/articles/sharing-your-labor-of-love-pypi-quick-and-dirty/
+- https://tom-christie.github.io/articles/pypi/
+- `virtualenv -p python3 env_nocython`
+
+## uploading to pypi test server
+- make wheel and sdist files
+- make sure i have a `~/.pypirc` file
+- `pip install twine`
+- register project the first time: `twine register -r test dist/*.whl` (-r tells it to use your test server in your `.pypirc`)
+  -  or use `python setup.py register`
+- `twine upload -r test dist/*`
+- test with `pip install -i https://testpypi.python.org/pypi cyscs`
+- test installation with `py.test --pyargs cyscs`
+
+## uploading to true pypi
+- `make clean`
+- `make sdist wheel`
+- `twine register dist/*.whl`
+- `twine upload dist/*`
+- test with `pip install cyscs`
+- test installation with `py.test --pyargs cyscs`
+- can skip using the wheel with `pip install cyscs --no-binary :all:`
