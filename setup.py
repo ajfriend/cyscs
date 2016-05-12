@@ -44,14 +44,14 @@ ext['include_dirs'] += [numpy.get_include()]
 ext_direct = copy.deepcopy(ext)
 # next two names need to match
 ext_direct['name'] = 'cyscs._direct'
-ext_direct['sources'] += ['src/cyscs/_direct' + file_ext]
+ext_direct['sources'] += ['cyscs/_direct' + file_ext]
 ext_direct['sources'] += glober(rootDir, ['linsys/direct/*.c', 'linsys/direct/external/*.c'])
 ext_direct['include_dirs'] += glober(rootDir, ['linsys/direct/', 'linsys/direct/external/'])
 
 
 ext_indirect = copy.deepcopy(ext)
 ext_indirect['name'] = 'cyscs._indirect'
-ext_indirect['sources'] += ['src/cyscs/_indirect' + file_ext]
+ext_indirect['sources'] += ['cyscs/_indirect' + file_ext]
 ext_indirect['sources'] += glober(rootDir, ['linsys/indirect/*.c'])
 ext_indirect['include_dirs'] += glober(rootDir, ['linsys/indirect/'])
 ext_indirect['define_macros'] += [('INDIRECT', None)]
@@ -74,7 +74,6 @@ setup(name='cyscs',
         description='CySCS: A Cython wrapper for the SCS convex optimization solver.',
         packages=['cyscs'],
 #        py_modules=['scs.examples'],
-        package_dir={'': 'src'},
         package_data={'cyscs': ['test/*.py']},
         zip_safe=False,
         ext_modules=extensions,

@@ -4,7 +4,7 @@ all: reinstall test
 
 clean:
 	-pip uninstall cyscs
-	$(RM) -rf src/*.egg-info src/cyscs/*.pyc *.pyc dist build src/cyscs/*.c cyscs/*.so src/cyscs/__pycache__ .cache/ test/__pycache__ __pycache__ test/*.pyc test/__pycache__
+	$(RM) -rf *.egg-info cyscs/*.pyc *.pyc dist build cyscs/*.c cyscs/*.so cyscs/__pycache__ .cache/ test/__pycache__ __pycache__ test/*.pyc test/__pycache__
 
 reinstall: clean
 	python setup.py install --cython
