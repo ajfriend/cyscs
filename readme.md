@@ -19,8 +19,9 @@ Advanced users can consult the interface notes below, the [tutorial IPython note
 
 ## Installation
 ### Pip
-- XXX: not yet uploaded to PyPI, so `pip` won't work
+- `pip install numpy scipy`
 - `pip install cyscs`
+- Optionally, test with `pip install pytest` and `py.test --pyargs cyscs`
 
 ### Building from source with Cython
 Users can also install by
