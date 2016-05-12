@@ -67,7 +67,7 @@ if USE_CYTHON:
 
 
 setup(name='cyscs',
-        version='1.2.3',
+        version='1.2.6',
         author = 'AJ Friend',
         author_email = 'ajfriend@gmail.com',
         url = 'http://github.com/ajfriend/cyscs',
