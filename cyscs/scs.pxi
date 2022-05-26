@@ -124,7 +124,7 @@ cdef c_Cone stuff_c_cone(dict cone):
     c_cone = c_Cone(f=0, l=0, ep=0, ed=0,
                     q=NULL, qsize=0,
                     s=NULL, ssize=0,
-                    p=NULL, psize=0)
+                    p=NULL, psize=0, z=0)
 
     c_cone.f = cone.get('f', 0)
     c_cone.l = cone.get('l', 0)
@@ -145,6 +145,8 @@ cdef c_Cone stuff_c_cone(dict cone):
         p = cone['p']
         c_cone.psize = p.shape[0]
         c_cone.p = &p[0]
+    
+    c_cone.z = cone.get('z', 0)
 
     return c_cone    
 
