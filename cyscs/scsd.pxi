@@ -96,4 +96,5 @@ cdef extern from "cones.h":
         scs_int psize # number of (primal and dual) power cone triples */
         scs_float * p # array of power cone params, must be \in [-1, 1],
                        # negative values are interpreted as specifying the dual cone */
+        scs_int z # number of linear equality constraints (primal zero, dual free)
 
