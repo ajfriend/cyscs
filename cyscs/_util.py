@@ -85,6 +85,9 @@ def format_and_copy_cone(cone_in):
     for key in 'f', 'l', 'ep', 'ed':
         if key in cone_in:
             cone_out[key] = cone_in[key]
+            
+    if 'z' in cone_in:
+            cone_out['f'] = cone_in['z']
 
     for key in 'q', 's':
         if key in cone_in and len(cone_in[key]) > 0:
